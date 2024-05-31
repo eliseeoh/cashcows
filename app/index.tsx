@@ -1,5 +1,7 @@
 import React from 'react';
-import { Text, View, StyleSheet, Button, TextInput } from "react-native";
+import { SafeAreaView, StyleSheet} from "react-native";
+import { PaperProvider, TextInput, Button, Card } from 'react-native-paper';
+import {LoginScreen} from './login/login.screen';
 
 const styles = StyleSheet.create({
   appContainer: {
@@ -23,22 +25,11 @@ const styles = StyleSheet.create({
   }
 })
 
-const TextIn = (props: { ph: string | undefined; }) => (
-  <TextInput 
-    onChangeText = {text => onChangeText(text)} 
-    autoCapitalize= 'none' placeholder={props.ph} style= {styles.input}></TextInput>
-)
-
 export default function Index() {
-  const [email, OnChangeText] = React.useState('');
-  const [password, OnChangeText] = React.useState('');
-
   return (
-    <View style={styles.appContainer}>
-      <Text style={styles.defaultSemiBold}>Login</Text>
-      <TextIn ph= "Email"/>
-      <TextIn ph= "Password"/>
-      <Button title= "Sign in"/>
-    </View>
+    <PaperProvider>
+      <LoginScreen/>
+    </PaperProvider>
+
   );
 }
