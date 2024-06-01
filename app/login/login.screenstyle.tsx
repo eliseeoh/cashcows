@@ -2,16 +2,29 @@ import { StyleSheet} from "react-native";
 
 export const loginStyles = StyleSheet.create ({
     appContainer: {
-        display: "flex",
+        flex: 1,
+    },
+    image: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    scrollV: {
+        flexGrow: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        flex: 1,
-        flexDirection: 'row'
+        paddingHorizontal: 30
     },
     view: {
-        width: '80%'
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 30
     },
     centerT: {
         textAlign: 'center'
+    },
+    textIn: {
+        marginBottom: 10
     },
 })
