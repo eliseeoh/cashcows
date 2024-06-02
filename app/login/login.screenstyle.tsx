@@ -13,13 +13,11 @@ export const loginStyles = StyleSheet.create ({
         flexGrow: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingHorizontal: 30
     },
     view: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingHorizontal: 30
     },
     centerT: {
         textAlign: 'center'

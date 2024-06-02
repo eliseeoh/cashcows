@@ -1,20 +1,23 @@
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const connectDB = require("./db");
-const authRoutes = require("./Auth/route");
-const { adminAuth, userAuth } = require("./middleware/auth.js");
+const authRoutes = require("./route");
+const { adminAuth, userAuth } = require("../middleware/auth.js");
+const cors = require('cors');
 
 const app = express();
-const PORT = 5000;
+const PORT = 5001;
+const jwtSecret = 'your_jwt_secret';
 
 app.set("view engine", "ejs");
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors());
 
 connectDB();
 
-app.listen(PORT, () => console.log(`Server Connected to port ${PORT}`));
+app.listen(PORT, '0.0.0.0', () => console.log(`Server Connected to port ${PORT}`));
 
 // Routes
 app.use("/api/auth", authRoutes);
