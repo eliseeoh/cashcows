@@ -12,7 +12,7 @@ export const RegisterScn= () => {
 
     const handleRegister = async () => {
         try {
-          const data = await registerUser(username, password);
+          const data = await registerUser(email, username, password);
           console.log('Registration successful', data);
           // Navigate to another screen or update UI based on registration success
         } catch (error) {

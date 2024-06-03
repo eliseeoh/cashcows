@@ -4,77 +4,101 @@ const bcrypt = require("bcryptjs");
 
 const jwtSecret = '5310e07a5d2204812ad20a9c030f4455ef1d858dc7e1f6ec4edc64b8a3ac8f7d1dc7ff';
 
+
 exports.register = async (req, res, next) => {
-    const { username, password } = req.body;
-  
-    bcrypt.hash(password, 10)
-        .then(async (hash) => {
-            const user = await User.create({
-                username,
-                password: hash,
+    const { email, username, password } = req.body;
+
+    try {
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({
+                message: "Email already in use",
             });
-            const maxAge = 3 * 60 * 60;
-            const token = jwt.sign(
-                { id: user._id, username, role: user.role },
-                jwtSecret,
-                { expiresIn: maxAge } // 3hrs in sec
-            );
-            res.cookie("jwt", token, {
-                httpOnly: true,
-                maxAge: maxAge * 1000, // 3hrs in ms
-            });
-            res.status(201).json({
-                message: "User successfully created",
-                user: user._id,
-            });
-        })
-        .catch((error) =>
-            res.status(400).json({
-                message: "User not successfully created",
-                error: error.message,
-            })
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const user = await User.create({
+            email,
+            username,
+            password: hashedPassword,
+        });
+
+        const maxAge = 3 * 60 * 60;
+        const token = jwt.sign(
+            { id: user._id, email, role: user.role },
+            jwtSecret,
+            { expiresIn: maxAge }
         );
+
+        res.cookie("jwt", token, {
+            httpOnly: true,
+            maxAge: maxAge * 1000,
+        });
+
+        res.status(201).json({
+            message: "User successfully created",
+            user: user._id,
+        });
+    } catch (error) {
+        res.status(400).json({
+            message: "User not successfully created",
+            error: error.message,
+        });
+    }
 };
 
 exports.login = async (req, res, next) => {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
+    console.log('Login attempt:', email);  // Log email
+
     try {
-        const user = await User.findOne({ username });
+        const user = await User.findOne({ email });
         if (!user) {
+            console.log('User not found for email:', email);  // Log if user not found
             return res.status(400).json({
                 message: "Login not successful",
                 error: "User not found",
             });
         }
+
+        console.log('User found:', user);  // Log user details
+
         bcrypt.compare(password, user.password)
             .then((result) => {
                 if (result) {
+                    console.log('Password match for user:', user.email);  // Log successful password match
+
                     const maxAge = 3 * 60 * 60;
                     const token = jwt.sign(
-                        { id: user._id, username, role: user.role },
+                        { id: user._id, username: user.username, role: user.role },
                         jwtSecret,
-                        { expiresIn: maxAge } // 3hrs in sec
+                        { expiresIn: maxAge }
                     );
+
                     res.cookie("jwt", token, {
                         httpOnly: true,
-                        maxAge: maxAge * 1000, // 3hrs in ms
+                        maxAge: maxAge * 1000,
                     });
-                    res.status(200).json({
+
+                    return res.status(200).json({
                         message: "User successfully logged in",
                         user: user._id,
                     });
                 } else {
-                    res.status(400).json({ message: "Login not successful" });
+                    console.log('Password mismatch for user:', user.email);  // Log password mismatch
+                    return res.status(400).json({ message: "Login not successful" });
                 }
             })
             .catch((error) => {
-                res.status(400).json({
+                console.log('Error during password comparison:', error.message);  // Log error during password comparison
+                return res.status(400).json({
                     message: "An error occurred",
                     error: error.message,
                 });
             });
     } catch (error) {
-        res.status(400).json({
+        console.log('Error during login process:', error.message);  // Log error during login process
+        return res.status(400).json({
             message: "An error occurred",
             error: error.message,
         });

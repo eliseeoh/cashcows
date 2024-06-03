@@ -29,7 +29,8 @@ export const LoginScreen = ({navigation}) => {
                         <Card>
                             <Card.Title title="Log in" titleStyle={loginStyles.centerT}></Card.Title>
                             <Card.Content>
-                                <TextInput label="Username"
+                                <TextInput label="Email"
+                                    autoCapitalize='none'
                                     onChangeText={setEmail}></TextInput>
                                 <TextInput label="Password" 
                                     secureTextEntry={true}
