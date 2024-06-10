@@ -2,10 +2,8 @@ import React, {useState} from 'react';
 import { ImageBackground, SafeAreaView, ScrollView, View, Alert} from "react-native";
 import {TextInput, Button, Card } from 'react-native-paper';
 import { loginStyles } from './login.screenstyle';
-import { RegisterScn } from './register.screen';
-import {NavigationContainer} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {loginUser} from "../../authentication/apiService.js"
+import { useNavigate } from 'react-router-dom';
 
 export const LoginScreen = ({navigation}) => {
     const [email, setEmail] = useState('');
@@ -15,7 +13,9 @@ export const LoginScreen = ({navigation}) => {
         try {
           const data = await loginUser(email, password);
           console.log('Login successful', data);
+          Alert.alert('Login Successful', 'You have successfully logged in!');
           // Navigate to another screen or update UI based on login success
+
         } catch (error) {
           Alert.alert('Login Failed', error.message);
         }
@@ -25,7 +25,7 @@ export const LoginScreen = ({navigation}) => {
         <SafeAreaView style={loginStyles.appContainer}>
             <ImageBackground style={loginStyles.image} source={require('../../assets/images/login/background.png')}>
                 <ScrollView contentContainerStyle={loginStyles.scrollV}>
-                    <View style={loginStyles.view}>
+                    <View style={loginStyles.viewReg}>
                         <Card>
                             <Card.Title title="Log in" titleStyle={loginStyles.centerT}></Card.Title>
                             <Card.Content>
@@ -38,7 +38,7 @@ export const LoginScreen = ({navigation}) => {
                                     onChangeText={setPassword}></TextInput>
                                 <Button 
                                 uppercase={false}
-                                >Forgot email or password?</Button>
+                                >Forgot password?</Button>
                                 <Button mode="contained" onPress={handleLogin}>Sign in</Button>
                                 <Button onPress={() => navigation.navigate("Register")}>Register now!</Button>
                             </Card.Content>

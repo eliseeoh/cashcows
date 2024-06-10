@@ -4,10 +4,11 @@ const connectDB = require("./db");
 const authRoutes = require("./route");
 const { adminAuth, userAuth } = require("../middleware/auth.js");
 const cors = require('cors');
+require('dotenv').config();
 
 const app = express();
 const PORT = 5001;
-const jwtSecret = 'your_jwt_secret';
+const jwtSecret = process.env.JWT_SECRET;
 
 app.set("view engine", "ejs");
 

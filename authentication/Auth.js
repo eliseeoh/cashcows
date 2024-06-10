@@ -1,11 +1,11 @@
 const User = require("../model/user");
 const jwt = require('jsonwebtoken');
 const bcrypt = require("bcryptjs");
+require('dotenv').config({ path: '../.env' });
 
-const jwtSecret = '5310e07a5d2204812ad20a9c030f4455ef1d858dc7e1f6ec4edc64b8a3ac8f7d1dc7ff';
+const jwtSecret = process.env.JWT_SECRET;
 
-
-exports.register = async (req, res, next) => {
+exports.register = async (req, res) => {
     const { email, username, password } = req.body;
 
     try {
@@ -22,6 +22,8 @@ exports.register = async (req, res, next) => {
             username,
             password: hashedPassword,
         });
+
+        console.log('User created:', user); // Add this line
 
         const maxAge = 3 * 60 * 60;
         const token = jwt.sign(
@@ -47,7 +49,7 @@ exports.register = async (req, res, next) => {
     }
 };
 
-exports.login = async (req, res, next) => {
+exports.login = async (req, res) => {
     const { email, password } = req.body;
     console.log('Login attempt:', email);  // Log email
 

@@ -14,15 +14,13 @@ export const loginStyles = StyleSheet.create ({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    view: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
     centerT: {
         textAlign: 'center'
     },
     textIn: {
         marginBottom: 10
     },
+    viewReg: {
+        width: 235
+    }
 })

@@ -1,18 +1,14 @@
 import React from 'react';
-import { SafeAreaView, StyleSheet} from "react-native";
 import { PaperProvider } from 'react-native-paper';
 import {LoginScreen} from './login/login.screen';
-import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import { RegisterScn } from './login/register.screen';
-
+import {Homepage} from './main/homepage.screen';
 
 const Stack = createNativeStackNavigator();
-
-export default function Index() {
-  return (
-		<PaperProvider>
-			<Stack.Navigator initialRouteName="Log in">
+function AuthStack() {
+	return (
+		<Stack.Navigator initialRouteName="Log in">
 				<Stack.Screen
 					name="Log in"
 					component={LoginScreen}
@@ -22,8 +18,21 @@ export default function Index() {
 					component={RegisterScn}
           options={{ 
             title: ""}}/>
-			</Stack.Navigator>
-		</PaperProvider>
+		</Stack.Navigator>
+	);
+}
 
+function AppStack() {
+	return (
+		<Stack.Navigator>
+			<Stack.Screen name="home" component={Homepage}/>
+		</Stack.Navigator>
+	)
+}
+export default function Index() {
+  return (
+	<PaperProvider>
+		<AuthStack />
+	</PaperProvider>
   );
 }

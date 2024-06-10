@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
+require('dotenv').config({ path: '../.env' })
 
-const localDB = 'mongodb://localhost:27017/role_auth';
+const localDB = process.env.MONGODB_URI;
 
 mongoose.connect(localDB, {
     useNewUrlParser: true,
@@ -15,3 +16,4 @@ mongoose.connect(localDB, {
     console.error('Error clearing database:', error.message);
     process.exit(1);
 });
+

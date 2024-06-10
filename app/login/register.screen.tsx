@@ -14,6 +14,7 @@ export const RegisterScn= () => {
         try {
           const data = await registerUser(email, username, password);
           console.log('Registration successful', data);
+          Alert.alert('Registration Successful', 'You have successfully registered!');
           // Navigate to another screen or update UI based on registration success
         } catch (error) {
             console.error('Registration error:', error);
@@ -22,12 +23,10 @@ export const RegisterScn= () => {
     };
 
     return (
-        <SafeAreaView style={loginStyles.appContainer}>
             <ImageBackground style={loginStyles.image} 
                 source={require('../../assets/images/login/background.png')}
                 resizeMode='cover'>
-                <ScrollView contentContainerStyle={loginStyles.scrollV}>
-                    <View style={loginStyles.view}>
+                    <View style={loginStyles.viewReg}>
                         <Card>
                             <Card.Title title="Register!" titleStyle={loginStyles.centerT}></Card.Title>
                             <Card.Content>
@@ -48,8 +47,6 @@ export const RegisterScn= () => {
                             </Card.Content>
                         </Card>
                     </View>
-                </ScrollView>
             </ImageBackground>
-        </SafeAreaView>
     )
 }
