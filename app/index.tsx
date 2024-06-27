@@ -76,7 +76,7 @@ export default function Index() {
 import { initializeApp } from "firebase/app";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBI5EFePdUtipAz-lFaFLPSF0cdqsFG788",
+  apiKey: "AIzaSyCxgpWsVXck0X_jXZjCjIaLV_uO0qVZaJU",
   authDomain: "cashcows-4102f.firebaseapp.com",
   projectId: "cashcows-4102f",
   storageBucket: "cashcows-4102f.appspot.com",
