@@ -72,3 +72,16 @@ export default function Index() {
     </PaperProvider>
   );
 }
+
+import { initializeApp } from "firebase/app";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBI5EFePdUtipAz-lFaFLPSF0cdqsFG788",
+  authDomain: "cashcows-4102f.firebaseapp.com",
+  projectId: "cashcows-4102f",
+  storageBucket: "cashcows-4102f.appspot.com",
+  messagingSenderId: "3300826133",
+  appId: "1:3300826133:android:7cbd57d9d1e2f3349b821c",
+};
+
+const app = initializeApp(firebaseConfig);
