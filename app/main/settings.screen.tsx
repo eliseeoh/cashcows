@@ -1,4 +1,5 @@
 import React, {useContext} from 'react';
+import { auth } from '../../config/firebaseConfig';
 import { Text, Image, Button, SafeAreaView, ScrollView, View, Alert} from "react-native";
 import { AuthContext } from '../../authentication/authContext';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';

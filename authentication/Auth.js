@@ -1,10 +1,11 @@
-const { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } = require('firebase/auth');
-const bcrypt = require("bcryptjs");
-require('dotenv').config({ path: '../.env' });
+import { auth } from '../config/firebaseConfig';  // Update the path as necessary
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/compat/auth';
+import bcrypt from 'bcryptjs';
+import dotenv from 'dotenv';
 
-const auth = getAuth();
+dotenv.config({ path: '../.env' });
 
-exports.register = async (req, res) => {
+export const register = async (req, res) => {
   const { email, username, password } = req.body;
 
   try {
@@ -24,7 +25,7 @@ exports.register = async (req, res) => {
   }
 };
 
-exports.login = async (req, res) => {
+export const login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
@@ -43,24 +44,13 @@ exports.login = async (req, res) => {
   }
 };
 
-exports.update = async (req, res) => {
+export const update = async (req, res) => {
   // Update logic can be added here if needed for Firebase
   res.status(200).json({
     message: "Update function is not implemented for Firebase",
   });
 };
 
-exports.deleteUser = async (req, res) => {
-  const { id } = req.body;
-  try {
-    const user = await auth.getUser(id);
-    if (!user) {
-      return res.status(400).json({ message: "User not found" });
-    }
-    await auth.deleteUser(id);
-    res.status(201).json({ message: "User successfully deleted", user });
-  } catch (error) {
-    res.status(400).json({ message: "An error occurred", error: error.message });
-  }
-};
+export const deleteUser = asy
+
 
