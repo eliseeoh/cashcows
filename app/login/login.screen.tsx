@@ -4,7 +4,6 @@ import { ImageBackground, SafeAreaView, ScrollView, View, Alert } from 'react-na
 import { TextInput, Button, Card } from 'react-native-paper';
 import { loginStyles } from './login.screenstyle';
 import { AuthContext } from '../../authentication/authContext';
-import { signInWithEmailAndPassword } from 'firebase/auth';
 
 export const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -12,10 +11,17 @@ export const LoginScreen = ({ navigation }) => {
   const { signIn } = useContext(AuthContext);
 
   const handleLogin = async () => {
+    console.log('handleLogin called');
+    console.log('Email:', email);
+    console.log('Password:', password);
+
+    if (!email || !password) {
+      Alert.alert("Error", "Email and password are required.");
+      return;
+    }
+
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      console.log("User signed in:", userCredential.user);
-      signIn(); // Call your signIn function from AuthContext if needed
+      await signIn(email, password); // Call signIn from AuthContext
     } catch (error) {
       console.error("Error signing in:", error);
       Alert.alert("Error", "Failed to sign in. Please try again.");

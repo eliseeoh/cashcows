@@ -1,6 +1,6 @@
 import React, { createContext, useReducer, useEffect, useMemo } from 'react';
-import { loginUser, registerUser } from './apiService';
 import * as SecureStore from 'expo-secure-store';
+import { loginUser } from './apiService';
 
 const AuthContext = createContext();
 
@@ -36,7 +36,7 @@ const AuthProvider = ({ children }) => {
       userToken: null,
     }
   );
-  
+
   useEffect(() => {
     const bootstrapAsync = async () => {
       let userToken;
@@ -44,6 +44,7 @@ const AuthProvider = ({ children }) => {
       try {
         const token = await SecureStore.getItemAsync('userToken');
         userToken = token ? JSON.parse(token) : null;
+        console.log('Token retrieved from SecureStore:', userToken);
       } catch (e) {
         console.log('Restoring token failed:', e);
       }
@@ -53,23 +54,26 @@ const AuthProvider = ({ children }) => {
 
     bootstrapAsync();
   }, []);
-  
+
   const authContext = useMemo(
     () => ({
       signIn: async (email, password) => {
         try {
-          const userToken = await loginUser(email, password);
-          await SecureStore.setItemAsync('userToken', JSON.stringify(userToken));
-          dispatch({ type: 'SIGN_IN', token: userToken });
+          const { user, token } = await loginUser(email, password); // Retrieve user and token
+          console.log('signIn called with token:', token);
+          await SecureStore.setItemAsync('userToken', JSON.stringify(token));
+          console.log('Token set in SecureStore during signIn:', token);
+          dispatch({ type: 'SIGN_IN', token });
         } catch (error) {
           console.error('Sign in failed:', error);
         }
       },
-      signUp: async (email, username, password) => {
+      signUp: async (token) => {
         try {
-          const userToken = await registerUser(email, username, password); // Implement your registerUser function
-          await SecureStore.setItemAsync('userToken', JSON.stringify(userToken));
-          dispatch({ type: 'SIGN_IN', token: userToken });
+          console.log('signUp called with token:', token);
+          await SecureStore.setItemAsync('userToken', JSON.stringify(token));
+          console.log('Token set in SecureStore during signUp:', token);
+          dispatch({ type: 'SIGN_IN', token });
         } catch (error) {
           console.error('Sign up failed:', error);
         }
@@ -77,6 +81,7 @@ const AuthProvider = ({ children }) => {
       signOut: async () => {
         try {
           await SecureStore.deleteItemAsync('userToken');
+          console.log('Token removed from SecureStore');
         } catch (e) {
           console.error('Sign out failed:', e);
         }
@@ -85,12 +90,12 @@ const AuthProvider = ({ children }) => {
     }),
     []
   );
-  
-    return (
-      <AuthContext.Provider value={{ state, ...authContext }}>
-        {children}
-      </AuthContext.Provider>
-    );
-  };
-  
-  export { AuthContext, AuthProvider };
+
+  return (
+    <AuthContext.Provider value={{ state, ...authContext }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export { AuthContext, AuthProvider };
