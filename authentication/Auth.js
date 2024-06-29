@@ -1,5 +1,5 @@
 import { auth } from '../config/firebaseConfig';  // Update the path as necessary
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/compat/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
 

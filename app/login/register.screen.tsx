@@ -16,8 +16,9 @@ export const RegisterScn = () => {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       console.log("User registered:", userCredential.user);
-      signUp(); // Call your signUp function from AuthContext if needed
+      signUp();
     } catch (error) {
+
       console.error("Error registering:", error);
       Alert.alert("Error", "Failed to register. Please try again.");
     }
