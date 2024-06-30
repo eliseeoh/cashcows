@@ -8,6 +8,7 @@ import { LoginScreen } from './app/login/login.screen';
 import { RegisterScn } from './app/login/register.screen';
 import { Homepage } from './app/main/homepage.screen';
 import { Edit } from './app/main/editprof.screen';
+import { AddExp } from './app/main/addexpense.screen';
 
 const Stack = createNativeStackNavigator();
 
@@ -49,7 +50,6 @@ function AppStack() {
 function MainNavigator() {
   const { state } = useContext(AuthContext);
 
-  console.log("userToken:", state.userToken);
 
   return (
     <NavigationContainer>

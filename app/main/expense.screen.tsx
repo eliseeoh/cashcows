@@ -32,7 +32,7 @@ const febExp = [
     }
 ]
 
-const yrExpenses = [janExp,febExp]
+export const yrExpenses = [janExp,febExp]
 const months = ['January', 'February']
 
 export const Exp = ({navigation}) => {

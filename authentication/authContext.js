@@ -12,6 +12,7 @@ const AuthProvider = ({ children }) => {
           return {
             ...prevState,
             userToken: action.token,
+            user: action.user,
             isLoading: false,
           };
         case 'SIGN_IN':
@@ -19,12 +20,14 @@ const AuthProvider = ({ children }) => {
             ...prevState,
             isSignout: false,
             userToken: action.token,
+            user: action.user,
           };
         case 'SIGN_OUT':
           return {
             ...prevState,
             isSignout: true,
             userToken: null,
+            user: null,
           };
         default:
           return prevState;
@@ -34,22 +37,26 @@ const AuthProvider = ({ children }) => {
       isLoading: true,
       isSignout: false,
       userToken: null,
+      user: null,
     }
   );
 
   useEffect(() => {
     const bootstrapAsync = async () => {
       let userToken;
+      let user;
 
       try {
         const token = await SecureStore.getItemAsync('userToken');
         userToken = token ? JSON.parse(token) : null;
-        console.log('Token retrieved from SecureStore:', userToken);
+        
+        const userData = await SecureStore.getItemAsync('userData');
+        user = userData ? JSON.parse(userData) : null;
       } catch (e) {
         console.log('Restoring token failed:', e);
       }
 
-      dispatch({ type: 'RESTORE_TOKEN', token: userToken });
+      dispatch({ type: 'RESTORE_TOKEN', token: userToken, user });
     };
 
     bootstrapAsync();
@@ -62,18 +69,20 @@ const AuthProvider = ({ children }) => {
           const { user, token } = await loginUser(email, password); // Retrieve user and token
           console.log('signIn called with token:', token);
           await SecureStore.setItemAsync('userToken', JSON.stringify(token));
-          console.log('Token set in SecureStore during signIn:', token);
-          dispatch({ type: 'SIGN_IN', token });
+          await SecureStore.setItemAsync('userData', JSON.stringify(user));
+          console.log('Token and user set in SecureStore during signIn:', token, user);
+          dispatch({ type: 'SIGN_IN', token, user });
         } catch (error) {
           console.error('Sign in failed:', error);
         }
       },
-      signUp: async (token) => {
+      signUp: async (token, user) => {
         try {
           console.log('signUp called with token:', token);
           await SecureStore.setItemAsync('userToken', JSON.stringify(token));
-          console.log('Token set in SecureStore during signUp:', token);
-          dispatch({ type: 'SIGN_IN', token });
+          await SecureStore.setItemAsync('userData', JSON.stringify(user));
+          console.log('Token and user set in SecureStore during signUp:', token, user);
+          dispatch({ type: 'SIGN_IN', token, user });
         } catch (error) {
           console.error('Sign up failed:', error);
         }
@@ -81,7 +90,8 @@ const AuthProvider = ({ children }) => {
       signOut: async () => {
         try {
           await SecureStore.deleteItemAsync('userToken');
-          console.log('Token removed from SecureStore');
+          await SecureStore.deleteItemAsync('userData');
+          console.log('Token and user removed from SecureStore');
         } catch (e) {
           console.error('Sign out failed:', e);
         }

@@ -3,7 +3,11 @@
   "compilerOptions": {
     "strict": true,
     "esModuleInterop": true,
+    "skipLibCheck": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
+    "types": ["firebase"],
     "paths": {
       "@/*": [
         "./*"

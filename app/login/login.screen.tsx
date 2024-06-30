@@ -11,9 +11,6 @@ export const LoginScreen = ({ navigation }) => {
   const { signIn } = useContext(AuthContext);
 
   const handleLogin = async () => {
-    console.log('handleLogin called');
-    console.log('Email:', email);
-    console.log('Password:', password);
 
     if (!email || !password) {
       Alert.alert("Error", "Email and password are required.");
