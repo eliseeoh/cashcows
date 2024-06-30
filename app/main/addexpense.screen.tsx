@@ -1,31 +1,55 @@
-import React, {useState} from 'react';
-import { Text, ScrollView, View, Alert} from "react-native";
+import React, { useState, useContext } from 'react';
+import { View, Alert } from "react-native";
+import { TextInput, Button } from 'react-native-paper';
 import { AuthContext } from '../../authentication/authContext';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import {TextInput, Button, Card } from 'react-native-paper';
-import {yrExpenses} from './expense.screen'
+import { expenseStyle } from './settings.screenstyle';
 
-export const AddExp = () => {
-    const [newExpense, setNewExpense] = useState({ category: '', title: '', price: 0 });
+export const AddExp = ({ navigation }) => {
+  const { addExpense } = useContext(AuthContext);
+  const [category, setCategory] = useState('');
+  const [title, setTitle] = useState('');
+  const [price, setPrice] = useState('');
 
-    const addExpense = () => {
-        // Validate new expense input
-        if (!newExpense.category || !newExpense.title || newExpense.price <= 0) {
-            alert('Please fill out all fields and ensure price is greater than 0.');
-            return;
-        }
+  const handleSave = () => {
+    if (!category || !title || !price) {
+      Alert.alert("Error", "All fields are required.");
+      return;
+    }
 
-        // Add new expense to the selected month's expenses
-        yrExpenses[selectedMonth] = [...yrExpenses[selectedMonth], newExpense];
-        setNewExpense({ category: '', title: '', price: 0 }); // Clear input fields after adding expense
+    const date = new Date();
+    const newExpense = { 
+      category, 
+      title, 
+      price: parseFloat(price),
+      date: date.toISOString() // Store date as ISO string
     };
+    console.log('New Expense:', newExpense);
+    addExpense(newExpense);
+    navigation.goBack();
+  };
 
-    return (
-        <View>
-            <TextInput label="Category"></TextInput>
-            <TextInput label="Name"></TextInput>
-            <TextInput label="Price"></TextInput>
-            <Button mode="contained">Save</Button>
-        </View>
-    )
-}
+  return (
+    <View style={expenseStyle.container}>
+      <TextInput 
+        label="Category"
+        value={category}
+        onChangeText={setCategory}
+        style={expenseStyle.textInput}
+      />
+      <TextInput 
+        label="Title"
+        value={title}
+        onChangeText={setTitle}
+        style={expenseStyle.textInput}
+      />
+      <TextInput 
+        label="Price"
+        value={price}
+        onChangeText={setPrice}
+        keyboardType="numeric"
+        style={expenseStyle.textInput}
+      />
+      <Button mode="contained" onPress={handleSave} style={expenseStyle.button}>Save</Button>
+    </View>
+  );
+};

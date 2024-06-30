@@ -57,11 +57,25 @@ export const expenseStyle = StyleSheet.create( {
         textAlign: 'center',
         color: 'red'
     },
-    add: {
-        position: 'absolute',
-        bottom: 20,
-        right: 20
+    textInput: {
+      marginBottom: 15,
+    },
+    categoryButtonsContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      marginVertical: 10,
+    },
+    categoryButton: {
+      margin: 5,
+    },
+    categoryTotal: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        padding: 10,
+        textAlign: 'center',
+        color: 'blue'
     }
+    
 })
 
 export const friendStyle = StyleSheet.create({

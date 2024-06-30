@@ -1,12 +1,13 @@
 import { auth } from '../config/firebaseConfig';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 
-export const registerUser = async (email, username, password) => {
+export const registerUser = async (email, password) => {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
+    const token = await user.getIdToken(); // Retrieve the user's token
     console.log('User registered:', user);
-    return user;
+    return { user, token }; // Return both user and token
   } catch (error) {
     console.error('Error registering user:', error);
     throw error;
