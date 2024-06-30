@@ -47,12 +47,12 @@ function AppStack() {
 function MainNavigator() {
   const { state } = useContext(AuthContext);
 
-  console.log("authData:", state.authData);
+  console.log("userToken:", state.userToken);
 
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        {state.authData == null ? (
+        {state.userToken == null ? (
           <Stack.Screen
             name="Auth"
             component={AuthStack}
