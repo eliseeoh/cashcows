@@ -40,6 +40,8 @@ function AppStack() {
         name="Edit Profile"
         component={Edit}
       />
+      <Stack.Screen name="AddExpense" 
+				component={AddExp} />
     </Stack.Navigator>
   );
 }
