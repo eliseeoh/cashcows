@@ -144,7 +144,7 @@ const AuthProvider = ({ children }) => {
     },
     signUp: async (email, password) => {
       try {
-        const { user, token } = await registerUser(email, password);
+        const { user, token } = await registerUser(email, password); // Ensure this returns both user and token
         await SecureStore.setItemAsync('userToken', JSON.stringify(token));
         await SecureStore.setItemAsync('userId', JSON.stringify(user.uid));
         fetchUserExpenses(user.uid);
