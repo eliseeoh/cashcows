@@ -2,8 +2,7 @@ import React, { createContext, useReducer, useEffect, useMemo } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { loginUser, registerUser } from './apiService';
 import { auth, db } from '../config/firebaseConfig';
-import { doc, setDoc, getDocs, collection } from "firebase/firestore"; 
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, setDoc, getDocs, collection } from "firebase/firestore";
 
 const AuthContext = createContext();
 
@@ -17,6 +16,7 @@ const reducer = (prevState, action) => {
         userToken: action.token,
         userId: action.userId,
         isLoading: false,
+        user: action.user,
       };
     case 'SIGN_IN':
       return {
@@ -24,6 +24,7 @@ const reducer = (prevState, action) => {
         isSignout: false,
         userToken: action.token,
         userId: action.userId,
+        user: action.user,
       };
     case 'SIGN_OUT':
       return {
@@ -31,6 +32,7 @@ const reducer = (prevState, action) => {
         isSignout: true,
         userToken: null,
         userId: null,
+        user: null,
         expenses: initialExpenses,
       };
     case 'ADD_EXPENSE':
@@ -61,6 +63,7 @@ const AuthProvider = ({ children }) => {
     isSignout: false,
     userToken: null,
     userId: null,
+    user: null,
     expenses: initialExpenses,
   });
 
@@ -68,27 +71,33 @@ const AuthProvider = ({ children }) => {
     const bootstrapAsync = async () => {
       let userToken;
       let userId;
-  
+      let user;
+
       try {
         const token = await SecureStore.getItemAsync('userToken');
         const id = await SecureStore.getItemAsync('userId');
         userToken = token ? JSON.parse(token) : null;
         userId = id ? JSON.parse(id) : null;
+
+        if (userId) {
+          user = { uid: userId }; // Assuming minimal user info for bootstrap
+        }
+
         console.log('Bootstrap userToken:', userToken);
         console.log('Bootstrap userId:', userId);
       } catch (e) {
         console.log('Restoring token failed:', e);
       }
-  
+
       if (userToken && userId) {
         fetchUserExpenses(userId);
       }
-  
-      dispatch({ type: 'RESTORE_TOKEN', token: userToken, userId });
+
+      dispatch({ type: 'RESTORE_TOKEN', token: userToken, userId, user });
     };
-  
+
     bootstrapAsync();
-  }, []);  
+  }, []);
 
   const fetchUserExpenses = async (userId) => {
     try {
@@ -128,7 +137,7 @@ const AuthProvider = ({ children }) => {
         await SecureStore.setItemAsync('userToken', JSON.stringify(token));
         await SecureStore.setItemAsync('userId', JSON.stringify(user.uid));
         fetchUserExpenses(user.uid);
-        dispatch({ type: 'SIGN_IN', token, userId: user.uid });
+        dispatch({ type: 'SIGN_IN', token, userId: user.uid, user });
       } catch (error) {
         console.error('Sign in failed:', error);
       }
@@ -139,7 +148,7 @@ const AuthProvider = ({ children }) => {
         await SecureStore.setItemAsync('userToken', JSON.stringify(token));
         await SecureStore.setItemAsync('userId', JSON.stringify(user.uid));
         fetchUserExpenses(user.uid);
-        dispatch({ type: 'SIGN_IN', token, userId: user.uid });
+        dispatch({ type: 'SIGN_IN', token, userId: user.uid, user });
       } catch (error) {
         console.error('Sign up failed:', error);
       }
@@ -164,3 +173,4 @@ const AuthProvider = ({ children }) => {
 };
 
 export { AuthContext, AuthProvider };
+
