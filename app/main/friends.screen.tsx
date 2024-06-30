@@ -2,10 +2,10 @@ import React, { useState, useContext, useEffect } from 'react';
 import { Text, Button, SafeAreaView, ScrollView, View, Alert, TextInput, Modal, Pressable, TouchableOpacity } from "react-native";
 import { AuthContext } from '../../authentication/authContext'; 
 import { firestore } from '../../config/firebaseConfig';
-import { collection, query, where, getDocs, doc, updateDoc, setDoc, serverTimestamp, FieldValue } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, updateDoc, setDoc, serverTimestamp, FieldValue, arrayUnion, getDoc } from 'firebase/firestore';
 import { friendStyle } from './settings.screenstyle';
 
-export const Friends = () => {
+export const Friends = ({navigation}) => {
     const { state } = useContext(AuthContext); 
     const { user } = state;
     const [groups, setGroups] = useState<{ id: string; name: string }[]>([]);;
@@ -18,12 +18,12 @@ export const Friends = () => {
         // Fetch user's groups from Firestore
         const fetchGroups = async () => {
             try {
-                const q = query(collection(firestore, 'groups'), where('members', 'array-contains', user.uid));
+                const q = query(collection(firestore, 'groups'), where('members', 'array-contains', { id: user.uid, username: user.displayName }));
                 const groupsSnapshot = await getDocs(q);
                 
                 const fetchedGroups = groupsSnapshot.docs.map(doc => ({
                     id: doc.id,
-                    ...doc.data()
+                    name: doc.data().name
                 }));
 
                 setGroups(fetchedGroups);
@@ -46,14 +46,31 @@ export const Friends = () => {
 
         try {
             const groupRef = doc(firestore, 'groups', inputText);
-            await updateDoc(groupRef, {
-                members: FieldValue.arrayUnion(user.uid)
-            });
+            const groupDoc = await getDoc(groupRef);
 
-            Alert.alert('Success', 'You have joined the group successfully.');
-            setInputText('');
-            setModalVisible(false);
-            // Optionally, update state to reflect the new group membership without re-fetching
+            if (groupDoc.exists()) {
+                const groupData = groupDoc.data();
+                const isAlreadyMember = groupData.members.some(member => member.id === user.uid);
+
+                if (isAlreadyMember) {
+                    Alert.alert('Error', 'You are already a member of this group.');
+                    return;
+                }
+
+                await updateDoc(groupRef, {
+                    members: arrayUnion({
+                        username: user.displayName,
+                        id: user.uid
+                    })
+                });
+
+                setGroups(prevGroups => [...prevGroups, { id: groupRef.id, name: groupData.name }]);
+                Alert.alert('Success', 'You have joined the group successfully.');
+                setInputText('');
+                setModalVisible(false);
+            } else {
+                Alert.alert('Error', 'Group not found.');
+            }
         } catch (error) {
             console.error('Error joining group:', error);
             Alert.alert('Error', 'Failed to join the group. Please try again later.');
@@ -70,14 +87,20 @@ export const Friends = () => {
             const groupRef = doc(collection(firestore, 'groups'));
             await setDoc(groupRef, {
                 name: groupName,
-                members: [user.uid],
+                members: [{
+                    username: user.displayName,
+                    id: user.uid
+                }],
                 createdAt: serverTimestamp(),
             });
 
             const newGroup = {
                 id: groupRef.id,
                 name: groupName,
-                members: [user.uid],
+                members: [{
+                    username: user.displayName,
+                    id: user.uid
+                }],
                 createdAt: new Date(), // Use local timestamp or serverTimestamp() if preferred
             };
     
@@ -94,6 +117,11 @@ export const Friends = () => {
 
     const handleJoinButtonPress = () => {
         setModalVisible(true);
+    };
+
+    const handleGroupPress = (groupId) => {
+        // Navigate to the group details page or display group details
+        navigation.navigate('groups', { groupId }); // Assuming you have a GroupDetails screen
     };
 
     return (

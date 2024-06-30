@@ -127,3 +127,73 @@ export const friendStyle = StyleSheet.create({
         alignItems: 'center',
     },
 });
+
+export const groupStyle = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#f0f0f0',
+        padding: 20,
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 20,
+    },
+    subtitle: {
+        fontSize: 18,
+        marginBottom: 10,
+    },
+    betText: {
+        fontSize: 16,
+        marginBottom: 8
+    },
+    memberContainer: {
+        backgroundColor: '#fff',
+        padding: 15,
+        marginVertical: 8,
+        borderRadius: 8,
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowRadius: 5,
+        elevation: 3,
+    },
+    memberText: {
+        fontSize: 16,
+    },
+});
+
+export const betStyle = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#ffffff',
+        padding: 10,
+    },
+    betContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 15,
+        paddingVertical: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#cccccc',
+    },
+    betText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        flex: 1,
+        marginRight: 10,
+    },
+    input: {
+        height: 40,
+        borderColor: '#cccccc',
+        borderWidth: 1,
+        marginBottom: 10,
+        paddingHorizontal: 10,
+    },
+    voteText: {
+        fontSize: 16,
+        color: '#888',
+        marginBottom: 8,
+        marginRight: 10
+    },
+});

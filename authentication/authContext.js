@@ -70,6 +70,7 @@ const AuthProvider = ({ children }) => {
           console.log('signIn called with token:', token);
           await SecureStore.setItemAsync('userToken', JSON.stringify(token));
           await SecureStore.setItemAsync('userData', JSON.stringify(user));
+          console.log('user info', user);
           console.log('Token and user set in SecureStore during signIn:', token, user);
           dispatch({ type: 'SIGN_IN', token, user });
         } catch (error) {
@@ -79,10 +80,12 @@ const AuthProvider = ({ children }) => {
       signUp: async (token, user) => {
         try {
           console.log('signUp called with token:', token);
-          await SecureStore.setItemAsync('userToken', JSON.stringify(token));
-          await SecureStore.setItemAsync('userData', JSON.stringify(user));
+          const stringifiedToken = JSON.stringify(token);
+          const stringifiedUser = JSON.stringify(user);
+          await SecureStore.setItemAsync('userToken', stringifiedToken);
+          await SecureStore.setItemAsync('userData', stringifiedUser);
           console.log('Token and user set in SecureStore during signUp:', token, user);
-          dispatch({ type: 'SIGN_IN', token, user });
+          dispatch({ type: 'SIGN_IN', token: stringifiedToken, user: stringifiedUser });
         } catch (error) {
           console.error('Sign up failed:', error);
         }

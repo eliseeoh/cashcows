@@ -19,7 +19,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.eliseohh1506.cashcows"
     },
     "web": {
       "bundler": "metro",
@@ -38,8 +39,9 @@
         "origin": false
       },
       "eas": {
-        "projectId": "fff1935a-9ad4-4aae-baff-47b1c6738b96"
+        "projectId": "3480c4c5-7ba7-4f9b-bd68-65a1a5f6d2e1"
       }
-    }
+    },
+    "owner": "eliseohh1506"
   }
 }

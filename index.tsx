@@ -9,7 +9,8 @@ import { RegisterScn } from './app/login/register.screen';
 import { Homepage } from './app/main/homepage.screen';
 import { Edit } from './app/main/editprof.screen';
 import { AddExp } from './app/main/addexpense.screen';
-
+import {GroupDetails} from './app/main/groupdetails.screen'
+import { BetScreen } from './app/main/bets.screen';
 const Stack = createNativeStackNavigator();
 
 function AuthStack() {
@@ -43,6 +44,8 @@ function AppStack() {
       />
       <Stack.Screen name="AddExpense" 
 				component={AddExp} />
+      <Stack.Screen name="groups" component={GroupDetails}/>
+      <Stack.Screen name="Bets" component={BetScreen}/>
     </Stack.Navigator>
   );
 }
