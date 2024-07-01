@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, SafeAreaView, ScrollView, StyleSheet, Alert, Button } from 'react-native';
+import { View, Text, SafeAreaView, ScrollView, Alert, Button } from 'react-native';
 import { doc, getDoc } from 'firebase/firestore';
-import { firestore } from '../../config/firebaseConfig';
+import { db } from '../../config/firebaseConfig';
 import { groupStyle } from './settings.screenstyle';
 
 export const GroupDetails = ({ route, navigation }) => {
@@ -12,7 +12,7 @@ export const GroupDetails = ({ route, navigation }) => {
     useEffect(() => {
         const fetchGroupDetails = async () => {
             try {
-                const groupDoc = await getDoc(doc(firestore, 'groups', groupId));
+                const groupDoc = await getDoc(doc(db, 'groups', groupId));
                 if (groupDoc.exists()) {
                     setGroup(groupDoc.data());
                 } else {
@@ -53,17 +53,19 @@ export const GroupDetails = ({ route, navigation }) => {
                 <Text style={groupStyle.subtitle}>Members:</Text>
                 {group.members.map((member, index) => (
                     <View key={index} style={groupStyle.memberContainer}>
-                        <Text style={groupStyle.memberText}>{member.username}</Text>
+                        <Text style={groupStyle.memberText}>{member}</Text>
                     </View>
                 ))}
                 <Text style={groupStyle.subtitle}>Highest Scoring Bet:</Text>
                 {group.topBet ? (
-                    <Text style={groupStyle.betText}>{group.topBet.description} (Votes: {group.highestBet.votes})</Text>
+                    <Text style={groupStyle.betText}>{group.topBet.description} (Votes: {group.topBet.votes})</Text>
                 ) : (
                     <Text style={groupStyle.betText}>No bets placed yet.</Text>
                 )}
-                <Button title="Vote/Place bets"
-                    onPress={() => navigation.navigate('Bets', {groupId})}/>
+                <Button
+                    title="Vote/Place bets"
+                    onPress={() => navigation.navigate('Bets', { groupId })}
+                />
             </ScrollView>
         </SafeAreaView>
     );

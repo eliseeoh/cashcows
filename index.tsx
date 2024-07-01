@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet } from "react-native";
 import { PaperProvider } from 'react-native-paper';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
@@ -9,8 +9,9 @@ import { RegisterScn } from './app/login/register.screen';
 import { Homepage } from './app/main/homepage.screen';
 import { Edit } from './app/main/editprof.screen';
 import { AddExp } from './app/main/addexpense.screen';
-import {GroupDetails} from './app/main/groupdetails.screen'
+import { GroupDetails } from './app/main/groupdetails.screen';
 import { BetScreen } from './app/main/bets.screen';
+
 const Stack = createNativeStackNavigator();
 
 function AuthStack() {
@@ -42,17 +43,24 @@ function AppStack() {
         name="Edit Profile"
         component={Edit}
       />
-      <Stack.Screen name="AddExpense" 
-				component={AddExp} />
-      <Stack.Screen name="groups" component={GroupDetails}/>
-      <Stack.Screen name="Bets" component={BetScreen}/>
+      <Stack.Screen
+        name="AddExpense"
+        component={AddExp}
+      />
+      <Stack.Screen
+        name="GroupDetails"
+        component={GroupDetails}
+      />
+      <Stack.Screen
+        name="Bets"
+        component={BetScreen}
+      />
     </Stack.Navigator>
   );
 }
 
 function MainNavigator() {
   const { state } = useContext(AuthContext);
-
 
   return (
     <NavigationContainer>
