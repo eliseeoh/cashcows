@@ -3,6 +3,7 @@ import { View, Text, SafeAreaView, ScrollView, Alert, Button } from 'react-nativ
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../config/firebaseConfig';
 import { groupStyle } from './settings.screenstyle';
+import { getAuth, getUser } from 'firebase/auth';
 
 export const GroupDetails = ({ route, navigation }) => {
     const { groupId } = route.params;
@@ -44,6 +45,16 @@ export const GroupDetails = ({ route, navigation }) => {
             </SafeAreaView>
         );
     }
+
+    const fetchUsernames = async (userId) => {
+        const auth = getAuth();
+        try {
+            const user = await auth.getUser(userId); // Firebase Admin SDK method
+            return user.displayName;
+        } catch (error) {
+            console.error('Error fetching user details:', error);
+        }
+    };
 
     return (
         <SafeAreaView style={groupStyle.container}>

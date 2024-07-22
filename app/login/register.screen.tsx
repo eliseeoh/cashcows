@@ -21,7 +21,7 @@ export const RegisterScn = ({ navigation }) => {
     }
 
     try {
-      await signUp(email, password); // Use signUp method from AuthContext
+      await signUp(email, password, username); // Use signUp method from AuthContext
       Alert.alert("Success", "Registration successful. You can now log in.");
       navigation.navigate('Log in');
     } catch (error) {

@@ -142,9 +142,9 @@ const AuthProvider = ({ children }) => {
         console.error('Sign in failed:', error);
       }
     },
-    signUp: async (email, password) => {
+    signUp: async (email, password, username) => {
       try {
-        const { user, token } = await registerUser(email, password); // Ensure this returns both user and token
+        const { user, token } = await registerUser(email, password, username); // Ensure this returns both user and token
         await SecureStore.setItemAsync('userToken', JSON.stringify(token));
         await SecureStore.setItemAsync('userId', JSON.stringify(user.uid));
         fetchUserExpenses(user.uid);
