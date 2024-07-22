@@ -1,18 +1,21 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Text, FlatList, View, ScrollView } from "react-native";
+import { Text, FlatList, View, Alert, ScrollView } from "react-native";
 import { AuthContext } from '../../authentication/authContext';
 import { expenseStyle } from './settings.screenstyle';
 import { Button } from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import * as Progress from 'react-native-progress';
 
 const months = [
   'January', 'February', 'March', 'April', 'May', 'June', 
   'July', 'August', 'September', 'October', 'November', 'December'
 ];
 
+const categories = ['Food', 'Health', 'Clothing', 'Household', 'Transport', 'Travel', 'Utilities', 'Entertainment', 'Payments', 'Personal', 'Others'];
+
 export const Exp = ({ navigation }) => {
-  const { state } = useContext(AuthContext);
-  const { expenses } = state;
+  const { state, deleteExpense } = useContext(AuthContext);
+  const { expenses, budgets } = state;
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [sum, setSum] = useState(0);
   const [groupedExpenses, setGroupedExpenses] = useState({});
@@ -51,10 +54,22 @@ export const Exp = ({ navigation }) => {
     setCategoryTotal(total);
   };
 
+  const handleDelete = async (expenseId, expenseDate) => {
+    try {
+      await deleteExpense(expenseId, expenseDate);
+      Alert.alert("Success", "Expense deleted successfully.");
+    } catch (error) {
+      console.error("Error deleting expense:", error);
+      Alert.alert("Error", "Failed to delete expense.");
+    }
+  };
+
   const renderItem = ({ item }) => (
     <View style={expenseStyle.item}>
       <Text>{item.title} - ${item.price.toFixed(2)}</Text>
       <Text>{new Date(item.date).toLocaleDateString()}</Text>
+      <Button mode="text" onPress={() => navigation.navigate("AddExpense", { expense: item })}>Edit</Button>
+      <Button mode="text" onPress={() => handleDelete(item.id, item.date)}>Delete</Button>
     </View>
   );
 
@@ -71,7 +86,7 @@ export const Exp = ({ navigation }) => {
         >
           All
         </Button>
-        {Object.keys(groupedExpenses).map((category) => (
+        {categories.map((category) => (
           <Button
             key={category}
             mode="contained"
@@ -97,13 +112,24 @@ export const Exp = ({ navigation }) => {
     );
   };
 
+  const budget = selectedCategory ? budgets[selectedCategory] : Object.values(budgets || {}).reduce((acc, budget) => acc + budget, 0);
+  const progress = budget ? (categoryTotal / budget) : 0;
+
   return (
     <View style={expenseStyle.container}>
       <Text style={expenseStyle.total}>Total: ${sum.toFixed(2)}</Text>
       {selectedCategory && (
-        <Text style={expenseStyle.categoryTotal}>
-          {selectedCategory} Total: ${categoryTotal.toFixed(2)}
-        </Text>
+        <View>
+          <Text style={expenseStyle.categoryTotal}>
+            {selectedCategory} Total: ${categoryTotal.toFixed(2)}
+          </Text>
+          {budget ? (
+            <View style={expenseStyle.progressContainer}>
+              <Progress.Bar progress={progress} width={200} />
+              <Text>{categoryTotal.toFixed(2)} / {budget}</Text>
+            </View>
+          ) : null}
+        </View>
       )}
       <View style={expenseStyle.navBar}>
         <Button 
@@ -117,13 +143,25 @@ export const Exp = ({ navigation }) => {
       <ScrollView contentContainerStyle={expenseStyle.categoryButtonsContainer}>
         {renderCategoryButtons()}
       </ScrollView>
-      {renderExpenses()}
-      <View style={expenseStyle.add}>
+      <View style={expenseStyle.expensesListContainer}>
+        {renderExpenses()}
+      </View>
+      <View style={expenseStyle.actions}>
         <Button
           mode='contained'
           icon={() => <MaterialCommunityIcons name="plus" size={24} color="black" />}
-          onPress={() => navigation.navigate("AddExpense", { selectedMonth })}>Add</Button>
+          onPress={() => navigation.navigate("AddExpense", { selectedMonth })}>
+          Add
+        </Button>
+        <Button
+          mode='contained'
+          icon={() => <MaterialCommunityIcons name="currency-usd" size={24} color="black" />}
+          onPress={() => navigation.navigate("BudgetScreen")}>
+          Budget
+        </Button>
       </View>
     </View>
   );
 };
+
+
