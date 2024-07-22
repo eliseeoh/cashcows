@@ -13,33 +13,45 @@ export const Friends = ({ navigation }) => {
     const [groupName, setGroupName] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
     const [createModalVisible, setCreateModalVisible] = useState(false);
+    const [loading, setLoading] = useState(true);
+
+    const fetchGroups = async () => {
+        try {
+            const q = query(collection(db, 'groups'), where('members', 'array-contains', user.uid));
+            const groupsSnapshot = await getDocs(q);
+            
+            const fetchedGroups = groupsSnapshot.docs.map(doc => {
+                const data = doc.data();
+                return {
+                    id: doc.id,
+                    name: data.name,
+                    ...data,
+                };
+            });
+
+            setGroups(fetchedGroups);
+        } catch (error) {
+            console.error('Error fetching user groups:', error);
+            Alert.alert('Error', 'Failed to fetch groups. Please try again later.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchGroups = async () => {
-            try {
-                const q = query(collection(db, 'groups'), where('members', 'array-contains', user.uid));
-                const groupsSnapshot = await getDocs(q);
-                
-                const fetchedGroups = groupsSnapshot.docs.map(doc => {
-                    const data = doc.data();
-                    return {
-                        id: doc.id,
-                        name: data.name,
-                        ...data,
-                    };
-                });
-
-                setGroups(fetchedGroups);
-            } catch (error) {
-                console.error('Error fetching user groups:', error);
-                Alert.alert('Error', 'Failed to fetch groups. Please try again later.');
-            }
-        };
 
         if (user) {
             fetchGroups();
         }
     }, [user]);
+
+    if (loading) {
+        return (
+            <SafeAreaView style={friendStyle.container}>
+                <Text>Loading...</Text>
+            </SafeAreaView>
+        );
+    }
 
     const joinGroup = async () => {
         if (!user) {
@@ -57,6 +69,8 @@ export const Friends = ({ navigation }) => {
             await updateDoc(groupRef, {
                 members: arrayUnion(user.uid)
             });
+
+            fetchGroups();
 
             Alert.alert('Success', 'You have joined the group successfully.');
             setInputText('');
@@ -120,7 +134,6 @@ export const Friends = ({ navigation }) => {
                     <TouchableOpacity key={group.id} onPress={() => handleGroupPress(group.id)}>
                         <View style={friendStyle.groupContainer}>
                             <Text style={friendStyle.groupText}>{group.name}</Text>
-                            <Text style={friendStyle.groupText}>{group.id}</Text>
                         </View>
                     </TouchableOpacity>
                 ))}

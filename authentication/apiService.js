@@ -7,15 +7,13 @@ export const registerUser = async (email, password, username) => {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
-    const token = await user.getIdToken();
-
-    await setDoc(doc(db, "users", user.uid), {
-      email,
-      username,
-      photoURL: ""
+    const token = await user.getIdToken(); // Retrieve the user's token
+    await setDoc(doc(db, 'users', user.uid), {
+      username: username,
+      email: email,
     });
-
-    return { user, token };
+    console.log('User registered:', user);
+    return { user, token }; // Return both user and token
   } catch (error) {
     throw error;
   }
