@@ -59,10 +59,10 @@ export const GroupDetails = ({ route, navigation }) => {
         }, [groupId])
     );
 
-    /*const copyToClipboard = async (text) => {
+    const copyToClipboard = async (text) => {
         await Clipboard.setStringAsync(text);
         Alert.alert('Copied to Clipboard!');
-      };*/
+      };
 
     if (loading) {
         return (
@@ -80,16 +80,16 @@ export const GroupDetails = ({ route, navigation }) => {
         );
     }
 
-                    /*<TouchableOpacity onPress={copyToClipboard}>
-                            <MaterialCommunityIcons name="content-copy" size={24} color="black" />
-                    </TouchableOpacity>*/
-
+    
     return (
         <SafeAreaView style={groupStyle.container}>
             <ScrollView>
                 <Text style={groupStyle.title}>{group.name}</Text>
                 <View>
                     <Text style={groupStyle.subtitle}>Group ID: {groupId}</Text>
+                    <TouchableOpacity onPress={()=> copyToClipboard(groupId)}>
+                            <MaterialCommunityIcons name="content-copy" size={24} color="black" />
+                    </TouchableOpacity>
                 </View>
                 <Text style={groupStyle.subtitle}>Members:</Text>
                 {members.map((member, index) => (
