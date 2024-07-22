@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import { Text, Button, SafeAreaView, ScrollView, View, Alert, TextInput, Modal, Pressable, TouchableOpacity } from "react-native";
 import { AuthContext } from '../../authentication/authContext'; 
 import { db } from '../../config/firebaseConfig';
-import { collection, query, where, getDocs, doc, updateDoc, setDoc, serverTimestamp, arrayUnion } from 'firebase/firestore';
+import { collection, query, where, getDocs, getDoc, doc, updateDoc, setDoc, serverTimestamp, arrayUnion } from 'firebase/firestore';
 import { friendStyle } from './settings.screenstyle';
 
 export const Friends = ({ navigation }) => {
@@ -66,6 +66,16 @@ export const Friends = ({ navigation }) => {
 
         try {
             const groupRef = doc(db, 'groups', inputText);
+            const groupDoc = await getDoc(groupRef);
+
+            if (groupDoc.exists()) {
+                const groupData = groupDoc.data();
+                if (groupData.members.includes(user.uid)) {
+                    Alert.alert('Info', 'You are already a member of this group.');
+                    return;
+                }
+            }
+
             await updateDoc(groupRef, {
                 members: arrayUnion(user.uid)
             });
@@ -208,5 +218,4 @@ export const Friends = ({ navigation }) => {
         </SafeAreaView>
     );
 };
-
 
