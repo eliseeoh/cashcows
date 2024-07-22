@@ -1,8 +1,8 @@
 import React, { createContext, useReducer, useEffect, useMemo } from 'react';
 import * as SecureStore from 'expo-secure-store';
-import { loginUser, registerUser } from './apiService';
+import { loginUser, registerUser, uploadProfilePicture, updateUserProfile } from './apiService';
 import { auth, db } from '../config/firebaseConfig';
-import { doc, setDoc, getDocs, collection, updateDoc, deleteDoc, addDoc } from "firebase/firestore";
+import { doc, getDoc, getDocs, collection, updateDoc, deleteDoc, addDoc } from "firebase/firestore";
 
 const AuthContext = createContext();
 
@@ -94,6 +94,11 @@ const reducer = (prevState, action) => {
         ...prevState,
         budgets: action.budgets,
       };
+    case 'UPDATE_PROFILE':
+      return {
+        ...prevState,
+        user: { ...prevState.user, ...action.payload },
+      };
     default:
       return prevState;
   }
@@ -123,7 +128,8 @@ const AuthProvider = ({ children }) => {
         userId = id ? JSON.parse(id) : null;
 
         if (userId) {
-          user = { uid: userId }; // Assuming minimal user info for bootstrap
+          const userDoc = await getDoc(doc(db, "users", userId));
+          user = { uid: userId, ...userDoc.data() };
         }
 
         console.log('Bootstrap userToken:', userToken);
@@ -208,25 +214,37 @@ const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateUserProfile = async (userId, profile) => {
+    try {
+      await updateDoc(doc(db, "users", userId), profile);
+      dispatch({ type: 'UPDATE_PROFILE', payload: profile });
+    } catch (error) {
+      console.error('Error updating user profile:', error);
+      throw error;
+    }
+  };
+
   const authContext = useMemo(() => ({
     signIn: async (email, password) => {
       try {
-        const { user, token } = await loginUser(email, password);
+        const { user, token, username } = await loginUser(email, password);
         await SecureStore.setItemAsync('userToken', JSON.stringify(token));
         await SecureStore.setItemAsync('userId', JSON.stringify(user.uid));
         fetchUserExpenses(user.uid);
-        dispatch({ type: 'SIGN_IN', token, userId: user.uid, user });
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        dispatch({ type: 'SIGN_IN', token, userId: user.uid, user: { ...user, ...userDoc.data() } });
       } catch (error) {
         console.error('Sign in failed:', error);
       }
     },
-    signUp: async (email, password) => {
+    signUp: async (email, password, username) => {
       try {
-        const { user, token } = await registerUser(email, password); // Ensure this returns both user and token
+        const { user, token } = await registerUser(email, password, username); // Ensure this returns both user and token
         await SecureStore.setItemAsync('userToken', JSON.stringify(token));
         await SecureStore.setItemAsync('userId', JSON.stringify(user.uid));
         fetchUserExpenses(user.uid);
-        dispatch({ type: 'SIGN_IN', token, userId: user.uid, user });
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        dispatch({ type: 'SIGN_IN', token, userId: user.uid, user: { ...user, ...userDoc.data() } });
       } catch (error) {
         console.error('Sign up failed:', error);
       }
@@ -244,6 +262,8 @@ const AuthProvider = ({ children }) => {
     editExpense,
     deleteExpense,
     setBudgets,
+    uploadProfilePicture,
+    updateUserProfile,
   }), [state]);
 
   return (
@@ -254,3 +274,4 @@ const AuthProvider = ({ children }) => {
 };
 
 export { AuthContext, AuthProvider };
+

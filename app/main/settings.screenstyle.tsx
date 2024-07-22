@@ -17,6 +17,10 @@ export const settStyle = StyleSheet.create({
         fontSize: 20,
         marginBottom: 10
     },
+    textInput: {
+        marginBottom: 10,
+        width: '80%'
+    },
     button: {
         marginBottom: 20
     },
@@ -26,72 +30,7 @@ export const settStyle = StyleSheet.create({
         justifyContent: "center",
         flexDirection: 'row'
     }
-})
-
-/* export const expenseStyle = StyleSheet.create({
-    container: {
-      flex: 1,
-      paddingTop: 25,
-      paddingHorizontal: 20,
-      position: 'relative',
-    },
-    navBar: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginBottom: 20,
-    },
-    monthText: {
-      fontSize: 20,
-      fontWeight: 'bold',
-    },
-    item: {
-      padding: 15,
-      borderBottomWidth: 1,
-      borderBottomColor: '#ccc',
-    },
-    total: {
-      fontSize: 18,
-      fontWeight: 'bold',
-      padding: 10,
-      textAlign: 'center',
-      color: 'red',
-    },
-    textInput: {
-      marginBottom: 15,
-    },
-    dropdown: {
-      marginBottom: 15,
-    },
-    dropdownContainer: {
-      marginBottom: 15,
-    },
-    categoryButtonsContainer: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      justifyContent: 'space-around',
-      marginVertical: 0,
-    },
-    categoryButton: {
-      margin: 5,
-    },
-    expensesListContainer: {
-      flex: 1,
-      marginTop: -180,
-    },
-    categoryTotal: {
-      fontSize: 18,
-      fontWeight: 'bold',
-      padding: 10,
-      textAlign: 'center',
-      color: 'blue',
-    },
-    add: {
-      padding: 10,
-      alignItems: 'center',
-    },
-  });
-  */
+});
   
 export const friendStyle = StyleSheet.create({
     container: {

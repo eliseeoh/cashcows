@@ -12,7 +12,6 @@ export const register = async (req, res) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
-    // Additional user information can be stored in Firestore if needed
     res.status(201).json({
       message: "User successfully created",
       user: user.uid,
