@@ -3,6 +3,7 @@ import { View, Text, TextInput, Button, FlatList, SafeAreaView, Alert } from 're
 import { db } from '../../config/firebaseConfig';
 import { collection, addDoc, getDocs, query, where, doc, updateDoc, increment, writeBatch } from 'firebase/firestore';
 import { betStyle } from './settings.screenstyle';
+import { getAuth } from 'firebase/auth';
 
 interface Bet {
   id: string;
@@ -14,6 +15,8 @@ export const BetScreen = ({ route }) => {
   const { groupId } = route.params;
   const [bets, setBets] = useState<Bet[]>([]);
   const [newBet, setNewBet] = useState('');
+  const auth = getAuth();
+  const currentUser = auth.currentUser;
 
   useEffect(() => {
     const fetchBets = async () => {
@@ -58,7 +61,35 @@ export const BetScreen = ({ route }) => {
 
   const voteForBet = async (betId: string) => {
     console.log('Vote button pressed for bet:', betId);
+
+    const userId = currentUser.uid;
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
     try {
+      // Check if the user has already voted this month
+      const q = query(
+        collection(db, 'votes'),
+        where('userId', '==', userId),
+        where('month', '==', currentMonth),
+        where('year', '==', currentYear)
+      );
+      const querySnapshot = await getDocs(q);
+
+      if (!querySnapshot.empty) {
+        Alert.alert('Error', 'You have already used your vote for this month.');
+        return;
+      }
+
+      // Add the vote to the votes collection to avoid revotes 
+      await addDoc(collection(db, 'votes'), {
+        userId,
+        betId,
+        groupId,
+        month: currentMonth,
+        year: currentYear,
+        createdAt: new Date()
+      });
+
       const betRef = doc(db, 'bets', betId);
       await updateDoc(betRef, {
         votes: increment(1) // Increment votes by 1
@@ -101,6 +132,15 @@ export const BetScreen = ({ route }) => {
         batch.delete(betRef);
       });
       await batch.commit();
+
+      // delete votes limit 
+      const votesQuery = query(collection(db, 'votes'), where('groupId', '==', groupId));
+      const votesSnapshot = await getDocs(votesQuery);
+      const votesBatch = writeBatch(db);
+      votesSnapshot.forEach(voteDoc => {
+        votesBatch.delete(voteDoc.ref);
+      });
+      await votesBatch.commit();
 
       // Update local state to reset votes
       setBets([]);

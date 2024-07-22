@@ -1,34 +1,68 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, SafeAreaView, ScrollView, Alert, Button } from 'react-native';
+import { View, Text, SafeAreaView, ScrollView, Alert, Button, TouchableOpacity} from 'react-native';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../config/firebaseConfig';
 import { groupStyle } from './settings.screenstyle';
-import { getAuth, getUser } from 'firebase/auth';
+import { useFocusEffect } from '@react-navigation/native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import * as Clipboard from 'expo-clipboard';
 
 export const GroupDetails = ({ route, navigation }) => {
     const { groupId } = route.params;
     const [group, setGroup] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [members, setMembers] = useState([]);
 
-    useEffect(() => {
-        const fetchGroupDetails = async () => {
-            try {
-                const groupDoc = await getDoc(doc(db, 'groups', groupId));
-                if (groupDoc.exists()) {
-                    setGroup(groupDoc.data());
-                } else {
-                    Alert.alert('Error', 'Group not found.');
-                }
-            } catch (error) {
-                console.error('Error fetching group details:', error);
-                Alert.alert('Error', 'Failed to fetch group details. Please try again later.');
-            } finally {
-                setLoading(false);
+    const fetchMemberDetails = async (memberIds) => {
+        try {
+            const memberDetails = await Promise.all(
+                memberIds.map(async (id) => {
+                    const userDoc = await getDoc(doc(db, 'users', id));
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        return { id, name: userData.username || 'Unknown User' };
+                    } else {
+                        return { id, name: 'Unknown User' };
+                    }
+                })
+            );
+            return memberDetails;
+        } catch (error) {
+            console.error('Error fetching user details:', error);
+            return memberIds.map(id => ({ id, name: 'Unknown User' }));
+        }
+    };
+
+    const fetchGroupDetails = async () => {
+        try {
+            const groupDoc = await getDoc(doc(db, 'groups', groupId));
+            if (groupDoc.exists()) {
+                const groupData = groupDoc.data();
+                setGroup(groupData);
+
+                const memberDetails = await fetchMemberDetails(groupData.members);
+                setMembers(memberDetails);
+            } else {
+                Alert.alert('Error', 'Group not found.');
             }
-        };
+        } catch (error) {
+            console.error('Error fetching group details:', error);
+            Alert.alert('Error', 'Failed to fetch group details. Please try again later.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
-        fetchGroupDetails();
-    }, [groupId]);
+    useFocusEffect(
+        React.useCallback(() => {
+            fetchGroupDetails();
+        }, [groupId])
+    );
+
+    /*const copyToClipboard = async (text) => {
+        await Clipboard.setStringAsync(text);
+        Alert.alert('Copied to Clipboard!');
+      };*/
 
     if (loading) {
         return (
@@ -46,25 +80,21 @@ export const GroupDetails = ({ route, navigation }) => {
         );
     }
 
-    const fetchUsernames = async (userId) => {
-        const auth = getAuth();
-        try {
-            const user = await auth.getUser(userId); // Firebase Admin SDK method
-            return user.displayName;
-        } catch (error) {
-            console.error('Error fetching user details:', error);
-        }
-    };
+                    /*<TouchableOpacity onPress={copyToClipboard}>
+                            <MaterialCommunityIcons name="content-copy" size={24} color="black" />
+                    </TouchableOpacity>*/
 
     return (
         <SafeAreaView style={groupStyle.container}>
             <ScrollView>
                 <Text style={groupStyle.title}>{group.name}</Text>
-                <Text style={groupStyle.subtitle}>Group ID: {groupId}</Text>
+                <View>
+                    <Text style={groupStyle.subtitle}>Group ID: {groupId}</Text>
+                </View>
                 <Text style={groupStyle.subtitle}>Members:</Text>
-                {group.members.map((member, index) => (
+                {members.map((member, index) => (
                     <View key={index} style={groupStyle.memberContainer}>
-                        <Text style={groupStyle.memberText}>{member}</Text>
+                        <Text style={groupStyle.memberText}>{member.name}</Text>
                     </View>
                 ))}
                 <Text style={groupStyle.subtitle}>Highest Scoring Bet:</Text>

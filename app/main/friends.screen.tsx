@@ -134,7 +134,6 @@ export const Friends = ({ navigation }) => {
                     <TouchableOpacity key={group.id} onPress={() => handleGroupPress(group.id)}>
                         <View style={friendStyle.groupContainer}>
                             <Text style={friendStyle.groupText}>{group.name}</Text>
-                            <Text style={friendStyle.groupText}>{group.id}</Text>
                         </View>
                     </TouchableOpacity>
                 ))}
