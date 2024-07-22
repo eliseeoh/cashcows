@@ -11,6 +11,7 @@ import { Edit } from './app/main/editprof.screen';
 import { AddExp } from './app/main/addexpense.screen';
 import { GroupDetails } from './app/main/groupdetails.screen';
 import { BetScreen } from './app/main/bets.screen';
+import { BudgetScreen } from './app/main/budget.screen';
 
 const Stack = createNativeStackNavigator();
 
@@ -54,6 +55,10 @@ function AppStack() {
       <Stack.Screen
         name="Bets"
         component={BetScreen}
+      />
+      <Stack.Screen
+        name="BudgetScreen"
+        component={BudgetScreen}
       />
     </Stack.Navigator>
   );
@@ -114,3 +119,5 @@ const styles = StyleSheet.create({
     color: "#38434D",
   },
 });
+
+

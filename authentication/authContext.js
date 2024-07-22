@@ -2,11 +2,12 @@ import React, { createContext, useReducer, useEffect, useMemo } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { loginUser, registerUser } from './apiService';
 import { auth, db } from '../config/firebaseConfig';
-import { doc, setDoc, getDocs, collection } from "firebase/firestore";
+import { doc, setDoc, getDocs, collection, updateDoc, deleteDoc, addDoc } from "firebase/firestore";
 
 const AuthContext = createContext();
 
 const initialExpenses = Array.from({ length: 12 }, () => []);
+const initialBudgets = {}; // Initialize budgets
 
 const reducer = (prevState, action) => {
   switch (action.type) {
@@ -34,23 +35,64 @@ const reducer = (prevState, action) => {
         userId: null,
         user: null,
         expenses: initialExpenses,
+        budgets: initialBudgets,
       };
     case 'ADD_EXPENSE':
       const updatedExpenses = [...prevState.expenses];
-      const month = new Date(action.payload.expense.date).getMonth();
-      if (!updatedExpenses[month]) {
-        updatedExpenses[month] = [];
+      const addMonth = new Date(action.payload.expense.date).getMonth();
+      if (!updatedExpenses[addMonth]) {
+        updatedExpenses[addMonth] = [];
       }
-      updatedExpenses[month].push(action.payload.expense);
-      updatedExpenses[month].sort((a, b) => new Date(b.date) - new Date(a.date));
+      updatedExpenses[addMonth].push(action.payload.expense);
+      updatedExpenses[addMonth].sort((a, b) => new Date(b.date) - new Date(a.date));
       return {
         ...prevState,
         expenses: updatedExpenses,
+      };
+    case 'EDIT_EXPENSE':
+      const editExpense = action.payload.expense;
+      const originalMonth = new Date(action.payload.originalDate).getMonth();
+      const newMonth = new Date(editExpense.date).getMonth();
+      const editedExpenses = [...prevState.expenses];
+
+      // Remove expense from the original month
+      if (originalMonth !== newMonth) {
+        editedExpenses[originalMonth] = editedExpenses[originalMonth].filter(exp => exp.id !== editExpense.id);
+      }
+
+      // Add or update expense in the new month
+      if (!editedExpenses[newMonth]) {
+        editedExpenses[newMonth] = [];
+      }
+      const expenseIndex = editedExpenses[newMonth].findIndex(exp => exp.id === editExpense.id);
+      if (expenseIndex !== -1) {
+        editedExpenses[newMonth][expenseIndex] = editExpense;
+      } else {
+        editedExpenses[newMonth].push(editExpense);
+      }
+      editedExpenses[newMonth].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      return {
+        ...prevState,
+        expenses: editedExpenses,
+      };
+    case 'DELETE_EXPENSE':
+      const filteredExpenses = [...prevState.expenses];
+      const deleteMonth = new Date(action.payload.date).getMonth();
+      filteredExpenses[deleteMonth] = filteredExpenses[deleteMonth].filter(exp => exp.id !== action.payload.id);
+      return {
+        ...prevState,
+        expenses: filteredExpenses,
       };
     case 'SET_EXPENSES':
       return {
         ...prevState,
         expenses: action.expenses,
+      };
+    case 'SET_BUDGETS':
+      return {
+        ...prevState,
+        budgets: action.budgets,
       };
     default:
       return prevState;
@@ -65,6 +107,7 @@ const AuthProvider = ({ children }) => {
     userId: null,
     user: null,
     expenses: initialExpenses,
+    budgets: initialBudgets, // Initialize budgets
   });
 
   useEffect(() => {
@@ -106,12 +149,16 @@ const AuthProvider = ({ children }) => {
       querySnapshot.forEach((doc) => {
         const data = doc.data();
         const month = new Date(data.date).getMonth();
-        expenses[month].push(data);
+        expenses[month].push({ ...data, id: doc.id });
       });
       dispatch({ type: 'SET_EXPENSES', expenses });
     } catch (error) {
       console.error('Error fetching user expenses:', error);
     }
+  };
+
+  const setBudgets = (budgets) => {
+    dispatch({ type: 'SET_BUDGETS', budgets });
   };
 
   const addExpense = async (expense) => {
@@ -123,10 +170,41 @@ const AuthProvider = ({ children }) => {
     console.log('Adding expense for user:', userId);
     console.log('Expense:', expense);
     try {
-      await setDoc(doc(collection(db, "users", userId, "expenses")), expense);
-      dispatch({ type: 'ADD_EXPENSE', payload: { expense } });
+      const docRef = await addDoc(collection(db, "users", userId, "expenses"), expense);
+      dispatch({ type: 'ADD_EXPENSE', payload: { expense: { ...expense, id: docRef.id } } });
     } catch (error) {
       console.error('Error adding expense:', error);
+    }
+  };
+
+  const editExpense = async (expense, originalDate) => {
+    const { userId } = state;
+    if (!userId) {
+      console.error('User ID is null, cannot edit expense.');
+      return;
+    }
+    console.log('Editing expense for user:', userId);
+    console.log('Expense:', expense);
+    try {
+      await updateDoc(doc(db, "users", userId, "expenses", expense.id), expense);
+      dispatch({ type: 'EDIT_EXPENSE', payload: { expense, originalDate } });
+    } catch (error) {
+      console.error('Error editing expense:', error);
+    }
+  };
+
+  const deleteExpense = async (expenseId, expenseDate) => {
+    const { userId } = state;
+    if (!userId) {
+      console.error('User ID is null, cannot delete expense.');
+      return;
+    }
+    console.log('Deleting expense for user:', userId);
+    try {
+      await deleteDoc(doc(db, "users", userId, "expenses", expenseId));
+      dispatch({ type: 'DELETE_EXPENSE', payload: { id: expenseId, date: expenseDate } });
+    } catch (error) {
+      console.error('Error deleting expense:', error);
     }
   };
 
@@ -163,6 +241,9 @@ const AuthProvider = ({ children }) => {
       dispatch({ type: 'SIGN_OUT' });
     },
     addExpense,
+    editExpense,
+    deleteExpense,
+    setBudgets,
   }), [state]);
 
   return (
@@ -173,4 +254,3 @@ const AuthProvider = ({ children }) => {
 };
 
 export { AuthContext, AuthProvider };
-
