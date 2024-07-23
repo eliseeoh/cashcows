@@ -5,6 +5,8 @@ import { expenseStyle } from './settings.screenstyle';
 import { Button } from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as Progress from 'react-native-progress';
+import { doc, updateDoc } from 'firebase/firestore';
+import { db } from '../../config/firebaseConfig';
 
 const months = [
   'January', 'February', 'March', 'April', 'May', 'June', 
@@ -38,6 +40,20 @@ export const Exp = ({ navigation }) => {
     setGroupedExpenses(grouped);
     setSelectedCategory(''); // Reset selected category when month changes
     setCategoryTotal(0); // Reset category total when month changes
+
+  // Save the total expense to the database
+  const saveTotalExpense = async () => {
+    try {
+      const userDocRef = doc(db, 'users', state.user.uid); // Assuming user.uid is the user ID
+      await updateDoc(userDocRef, {
+        totalExpense: total,
+      });
+      console.log('Total expense saved successfully.');
+    } catch (error) {
+      console.error('Error saving total expense:', error);
+    }
+  };
+  saveTotalExpense();
   }, [selectedMonth, expenses]);
 
   const handlePrevMonth = () => {

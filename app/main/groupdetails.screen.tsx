@@ -20,16 +20,16 @@ export const GroupDetails = ({ route, navigation }) => {
                     const userDoc = await getDoc(doc(db, 'users', id));
                     if (userDoc.exists()) {
                         const userData = userDoc.data();
-                        return { id, name: userData.username || 'Unknown User' };
+                        return { id, name: userData.username || 'Unknown User', totalExpense: userData.totalExpense || 0 };
                     } else {
-                        return { id, name: 'Unknown User' };
+                        return { id, name: 'Unknown User', totalExpense: 0 };
                     }
                 })
             );
             return memberDetails;
         } catch (error) {
             console.error('Error fetching user details:', error);
-            return memberIds.map(id => ({ id, name: 'Unknown User' }));
+            return memberIds.map(id => ({ id, name: 'Unknown User', totalExpense: 0 }));
         }
     };
 
@@ -64,6 +64,15 @@ export const GroupDetails = ({ route, navigation }) => {
         Alert.alert('Copied to Clipboard!');
       };
 
+    const getWinner = async () => {
+        try {
+            const winner = members.reduce((prev, curr) => (prev.totalExpense < curr.totalExpense ? prev : curr), members[0]);
+            Alert.alert('Winner', `${winner.name} with the lowest total expense of $${winner.totalExpense.toFixed(2)}`);
+        } catch (error) {
+            console.error('Error determining the winner:', error);
+            Alert.alert('Error', 'Failed to determine the winner. Please try again later.');
+        }
+    }
     if (loading) {
         return (
             <SafeAreaView style={groupStyle.container}>
@@ -107,6 +116,9 @@ export const GroupDetails = ({ route, navigation }) => {
                     title="Vote/Place bets"
                     onPress={() => navigation.navigate('Bets', { groupId })}
                 />
+                <Button 
+                    title="Consolidate expenses"
+                    onPress={() => getWinner()}/>
             </ScrollView>
         </SafeAreaView>
     );
