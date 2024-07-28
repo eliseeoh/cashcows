@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Text, Button, SafeAreaView, ScrollView, View, Alert, TextInput, Modal, Pressable, TouchableOpacity, ActivityIndicator } from "react-native";
+import { Text, SafeAreaView, ScrollView, View, Alert, TextInput, Modal, Pressable, TouchableOpacity, ActivityIndicator } from "react-native";
 import { AuthContext } from '../../authentication/authContext'; 
 import { db } from '../../config/firebaseConfig';
 import { collection, query, where, getDocs, getDoc, doc, updateDoc, setDoc, serverTimestamp, arrayUnion } from 'firebase/firestore';
@@ -136,7 +136,7 @@ export const Friends = ({ navigation }) => {
 
     const handleGroupPress = (groupId) => {
         console.log('Navigating to group details for group:', groupId);
-        navigation.navigate('GroupDetails', { groupId });
+        navigation.navigate('GroupDetails', { groupId, fetchGroups });
     };
 
     return (

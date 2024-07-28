@@ -1,19 +1,22 @@
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState, useContext } from 'react';
 import { View, Text, SafeAreaView, ScrollView, Alert, Pressable, TouchableOpacity, ActivityIndicator} from 'react-native';
-import { doc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { db } from '../../config/firebaseConfig';
 import { groupStyle, friendStyle } from './settings.screenstyle';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as Clipboard from 'expo-clipboard';
+import { AuthContext } from '../../authentication/authContext'; 
 
 export const GroupDetails = ({ route }) => {
-    const { groupId } = route.params;
+    const { groupId, fetchGroups } = route.params;
     const [group, setGroup] = useState(null);
     const [loading, setLoading] = useState(true);
     const [members, setMembers] = useState([]);
     const [canAnnounceWinner, setCanAnnounceWinner] = useState(true);
     const navigation = useNavigation();
+    const { state } = useContext(AuthContext); 
+    const { user } = state;
 
     const fetchMemberDetails = async (memberIds) => {
         try {
@@ -110,6 +113,28 @@ export const GroupDetails = ({ route }) => {
             Alert.alert('Error', 'Failed to determine the winner. Please try again later.');
         }
     }
+    
+    const exitGroup = async () => {
+        try {
+            // Assume `currentUserId` is the ID of the current user
+            const currentUserId = user.uid; // Replace with actual user ID
+            const groupRef = doc(db, 'groups', groupId);
+
+            // Remove the current user from the group's members array
+            await updateDoc(groupRef, {
+                members: arrayRemove(currentUserId)
+            });
+
+            Alert.alert('Success', 'You have left the group.');
+            fetchGroups();
+            navigation.goBack(); // Navigate back after leaving the group
+
+        } catch (error) {
+            console.error('Error exiting group:', error);
+            Alert.alert('Error', 'Failed to exit the group. Please try again later.');
+        }
+    }
+
     if (loading) {
         return (
             <SafeAreaView style={groupStyle.container}>
@@ -165,6 +190,9 @@ export const GroupDetails = ({ route }) => {
                     </Pressable>
                     <Pressable style={friendStyle.button} onPress={() => navigation.navigate('WinnerLog', {groupId})}>
                         <Text style={friendStyle.buttonText}>Winner History</Text>
+                    </Pressable>
+                    <Pressable style={friendStyle.exitButton} onPress={exitGroup}>
+                        <Text style={friendStyle.buttonText}>Exit Group</Text>
                     </Pressable>
                 </View>
             </ScrollView>

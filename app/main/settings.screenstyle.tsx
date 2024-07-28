@@ -81,6 +81,14 @@ export const friendStyle = StyleSheet.create({
         borderRadius: 12,
         alignItems: 'center'
     },
+    exitButton: {
+      marginVertical: 10,
+      padding: 15,
+      backgroundColor: '#000000',
+      borderRadius: 12,
+      alignItems: 'center',
+      marginTop: 120,
+    },
     buttonText: {
         color: '#fff',
         fontSize: 16,
