@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, SafeAreaView, ScrollView, Alert, Button, TouchableOpacity} from 'react-native';
-import { doc, getDoc } from 'firebase/firestore';
+import { View, Text, SafeAreaView, ScrollView, Alert, Pressable, TouchableOpacity, ActivityIndicator} from 'react-native';
+import { doc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { db } from '../../config/firebaseConfig';
-import { groupStyle } from './settings.screenstyle';
+import { groupStyle, friendStyle } from './settings.screenstyle';
 import { useFocusEffect } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as Clipboard from 'expo-clipboard';
@@ -67,6 +67,25 @@ export const GroupDetails = ({ route, navigation }) => {
     const getWinner = async () => {
         try {
             const winner = members.reduce((prev, curr) => (prev.totalExpense < curr.totalExpense ? prev : curr), members[0]);
+            const groupRef = doc(db, 'groups', groupId);
+            const groupDoc = await getDoc(groupRef);
+            const bet = groupDoc.data().topBet.description;
+
+            // Get the current month and year
+            const currentDate = new Date();
+            const month = currentDate.toLocaleString('default', { month: 'long' });
+            const year = currentDate.getFullYear();
+            await updateDoc(groupRef, {
+                winners: arrayUnion({
+                    name: winner.name,
+                    id: winner.id,
+                    totalExpense: winner.totalExpense,
+                    month,
+                    year,
+                    bet: bet
+                })
+            });
+
             Alert.alert('Winner', `${winner.name} with the lowest total expense of $${winner.totalExpense.toFixed(2)}`);
         } catch (error) {
             console.error('Error determining the winner:', error);
@@ -76,7 +95,10 @@ export const GroupDetails = ({ route, navigation }) => {
     if (loading) {
         return (
             <SafeAreaView style={groupStyle.container}>
-                <Text>Loading...</Text>
+                <View style={groupStyle.loadingContainer}>
+                    <ActivityIndicator size="large" color="#000000" />
+                    <Text style={groupStyle.loadingText}>Loading...</Text>
+                </View>
             </SafeAreaView>
         );
     }
@@ -94,10 +116,10 @@ export const GroupDetails = ({ route, navigation }) => {
         <SafeAreaView style={groupStyle.container}>
             <ScrollView>
                 <Text style={groupStyle.title}>{group.name}</Text>
-                <View>
+                <View style={groupStyle.groupId}>
                     <Text style={groupStyle.subtitle}>Group ID: {groupId}</Text>
                     <TouchableOpacity onPress={()=> copyToClipboard(groupId)}>
-                            <MaterialCommunityIcons name="content-copy" size={24} color="black" />
+                            <MaterialCommunityIcons name="content-copy" size={22} color="black" />
                     </TouchableOpacity>
                 </View>
                 <Text style={groupStyle.subtitle}>Members:</Text>
@@ -106,19 +128,26 @@ export const GroupDetails = ({ route, navigation }) => {
                         <Text style={groupStyle.memberText}>{member.name}</Text>
                     </View>
                 ))}
-                <Text style={groupStyle.subtitle}>Highest Scoring Bet:</Text>
+                <Text style={groupStyle.subtitle}>Highest Bet:</Text>
                 {group.topBet ? (
-                    <Text style={groupStyle.betText}>{group.topBet.description} (Votes: {group.topBet.votes})</Text>
+                    <View style={groupStyle.betCont}>
+                        <Text style={groupStyle.betText}>{group.topBet.description}</Text>
+                        <Text style={groupStyle.betText}>Votes: {group.topBet.votes}</Text>
+                    </View>
                 ) : (
                     <Text style={groupStyle.betText}>No bets placed yet.</Text>
                 )}
-                <Button
-                    title="Vote/Place bets"
-                    onPress={() => navigation.navigate('Bets', { groupId })}
-                />
-                <Button 
-                    title="Consolidate expenses"
-                    onPress={() => getWinner()}/>
+                <View style={groupStyle.buttonContainer}>
+                    <Pressable style={friendStyle.button} onPress={() => navigation.navigate('Bets', { groupId })}>
+                        <Text style={friendStyle.buttonText}>Vote/Place bets</Text>
+                    </Pressable>
+                    <Pressable style={friendStyle.button} onPress={getWinner}>
+                        <Text style={friendStyle.buttonText}>Announce Current Month's Winner</Text>
+                    </Pressable>
+                    <Pressable style={friendStyle.button} onPress={() => navigation.navigate('WinnerLog', {groupId})}>
+                        <Text style={friendStyle.buttonText}>Winner History</Text>
+                    </Pressable>
+                </View>
             </ScrollView>
         </SafeAreaView>
     );

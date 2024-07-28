@@ -12,7 +12,7 @@ import { AddExp } from './app/main/addexpense.screen';
 import { GroupDetails } from './app/main/groupdetails.screen';
 import { BetScreen } from './app/main/bets.screen';
 import { BudgetScreen } from './app/main/budget.screen';
-import { Settings } from './app/main/settings.screen';
+import { WinnerLog } from './app/main/winnerlog.screen';
 
 const Stack = createNativeStackNavigator();
 
@@ -61,9 +61,15 @@ function AppStack() {
         name="BudgetScreen"
         component={BudgetScreen}
       />
+<<<<<<< HEAD
       <Stack.Screen
         name="Profile"
         component={Settings}
+=======
+      <Stack.Screen 
+        name="WinnerLog"
+        component={WinnerLog}
+>>>>>>> 4bdf6aabcaeaee2d4ea02789bb60e66575371837
       />
     </Stack.Navigator>
   );

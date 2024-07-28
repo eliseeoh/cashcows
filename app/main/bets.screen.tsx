@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, FlatList, SafeAreaView, Alert } from 'react-native';
+import { View, Text, TextInput, Pressable, FlatList, SafeAreaView, Alert } from 'react-native';
 import { db } from '../../config/firebaseConfig';
 import { collection, addDoc, getDocs, query, where, doc, updateDoc, increment, writeBatch } from 'firebase/firestore';
-import { betStyle } from './settings.screenstyle';
+import { betStyle, friendStyle } from './settings.screenstyle';
 import { getAuth } from 'firebase/auth';
 
 interface Bet {
@@ -161,7 +161,9 @@ export const BetScreen = ({ route }) => {
           <View style={betStyle.betContainer}>
             <Text style={betStyle.betText}>{item.description}</Text>
             <Text style={betStyle.voteText}>Votes: {item.votes}</Text>
-            <Button title="Vote" onPress={() => voteForBet(item.id)} />
+            <Pressable style={betStyle.button} onPress={() => voteForBet(item.id)}>
+              <Text style={friendStyle.buttonText}>Vote</Text>
+            </Pressable>
           </View>
         )}
       />
@@ -171,8 +173,12 @@ export const BetScreen = ({ route }) => {
         onChangeText={setNewBet}
         placeholder="Suggest a new bet"
       />
-      <Button title="Add Bet" onPress={addBet} />
-      <Button title="Place Bets" onPress={placeBets} />
+      <Pressable style={friendStyle.button} onPress={addBet}>
+        <Text style={friendStyle.buttonText}>Add Bet</Text>
+      </Pressable>
+      <Pressable style={friendStyle.button} onPress={placeBets}>
+        <Text style={friendStyle.buttonText}>Place Bets </Text>
+      </Pressable>
     </SafeAreaView>
   );
 };
