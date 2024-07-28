@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Pressable, FlatList, SafeAreaView, Alert } from 'react-native';
 import { db } from '../../config/firebaseConfig';
-import { collection, addDoc, getDocs, query, where, doc, updateDoc, increment, writeBatch } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, where, doc, updateDoc, increment, writeBatch, deleteField } from 'firebase/firestore';
 import { betStyle, friendStyle } from './settings.screenstyle';
 import { getAuth } from 'firebase/auth';
 
@@ -11,8 +11,8 @@ interface Bet {
   votes: number;
 }
 
-export const BetScreen = ({ route }) => {
-  const { groupId } = route.params;
+export const BetScreen = ({ route, navigation }) => {
+  const { groupId, onBetsPlaced } = route.params;
   const [bets, setBets] = useState<Bet[]>([]);
   const [newBet, setNewBet] = useState('');
   const auth = getAuth();
@@ -115,6 +115,10 @@ export const BetScreen = ({ route }) => {
   };
 
   const placeBets = async () => {
+    if (bets.length === 0) {
+      Alert.alert('Error', 'No bets available to place.');
+      return;
+    }
     try {
       // Get the highest scoring bet
       const highestBet = bets.reduce((max, bet) => (bet.votes > max.votes ? bet : max), bets[0]);
@@ -122,7 +126,8 @@ export const BetScreen = ({ route }) => {
       // Save the highest scoring bet to the group document
       const groupRef = doc(db, 'groups', groupId);
       await updateDoc(groupRef, { 
-        topBet: highestBet 
+        topBet: highestBet,
+        lastAnnouncement: deleteField()
       });
 
       // Reset all bets to 0 using a batch update
@@ -146,6 +151,11 @@ export const BetScreen = ({ route }) => {
       setBets([]);
 
       Alert.alert('Success', 'Bets have been placed and votes reset.');
+
+      if (onBetsPlaced) {
+        console.log('bets placed');
+        onBetsPlaced();
+      }
     } catch (error) {
       console.error('Error placing bets:', error);
       Alert.alert('Error', 'Failed to place bets. Please try again later.');
