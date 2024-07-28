@@ -1,21 +1,34 @@
-apply plugin: 'com.android.application'
+plugins {
+    id 'com.android.application'
+    id 'com.google.gms.google-services'
+}
 
 android {
-    compileSdkVersion 32
-    buildToolsVersion "32.0.0"
+    namespace 'com.cashcows.myandroidapp'
+    compileSdkVersion 34
 
     defaultConfig {
         applicationId "com.cashcows.myandroidapp"
-        minSdkVersion 21
-        targetSdkVersion 32
+        minSdkVersion 23
+        targetSdkVersion 34
         versionCode 1
         versionName "1.0"
     }
 
+    signingConfigs {  // Define signingConfigs first
+        release {
+            keyAlias 'my-key-alias'
+            keyPassword 'cashcows123'
+            storeFile file('/Users/qiuyutong/cashcows/my-release-key.jks')
+            storePassword 'cashcows123'
+        }
+    }
+
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release  // Reference signingConfigs here
         }
     }
 }
@@ -25,8 +38,15 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.4.0'
     implementation platform('com.google.firebase:firebase-bom:33.1.1')
     implementation 'com.google.firebase:firebase-analytics'
-    implementation("com.google.firebase:firebase-auth")
-    implementation("com.google.firebase:firebase-firestore")
+    implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.firebase:firebase-firestore'
 }
+
+tasks.whenTaskAdded { task ->
+    if (task.name == 'mergeReleaseResources') {
+        task.dependsOn ':app:processReleaseGoogleServices'
+    }
+}
+
 
 apply plugin: 'com.google.gms.google-services'
