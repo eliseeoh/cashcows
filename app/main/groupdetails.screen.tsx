@@ -1,17 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { View, Text, SafeAreaView, ScrollView, Alert, Pressable, TouchableOpacity, ActivityIndicator} from 'react-native';
 import { doc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { db } from '../../config/firebaseConfig';
 import { groupStyle, friendStyle } from './settings.screenstyle';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as Clipboard from 'expo-clipboard';
 
-export const GroupDetails = ({ route, navigation }) => {
+export const GroupDetails = ({ route }) => {
     const { groupId } = route.params;
     const [group, setGroup] = useState(null);
     const [loading, setLoading] = useState(true);
     const [members, setMembers] = useState([]);
+    const [canAnnounceWinner, setCanAnnounceWinner] = useState(true);
+    const navigation = useNavigation();
 
     const fetchMemberDetails = async (memberIds) => {
         try {
@@ -33,7 +35,7 @@ export const GroupDetails = ({ route, navigation }) => {
         }
     };
 
-    const fetchGroupDetails = async () => {
+    const fetchGroupDetails = useCallback(async () => {
         try {
             const groupDoc = await getDoc(doc(db, 'groups', groupId));
             if (groupDoc.exists()) {
@@ -42,6 +44,20 @@ export const GroupDetails = ({ route, navigation }) => {
 
                 const memberDetails = await fetchMemberDetails(groupData.members);
                 setMembers(memberDetails);
+
+                const currentDate = new Date();
+                const lastAnnouncement = groupData.lastAnnouncement ? groupData.lastAnnouncement.toDate() : null;
+                if (lastAnnouncement) {
+                    const lastMonth = lastAnnouncement.getMonth();
+                    const lastYear = lastAnnouncement.getFullYear();
+                    if (currentDate.getMonth() === lastMonth && currentDate.getFullYear() === lastYear) {
+                        setCanAnnounceWinner(false);
+                    } else {
+                        setCanAnnounceWinner(true);
+                    }
+                } else {
+                    setCanAnnounceWinner(true);
+                }
             } else {
                 Alert.alert('Error', 'Group not found.');
             }
@@ -51,12 +67,12 @@ export const GroupDetails = ({ route, navigation }) => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [groupId]);
 
     useFocusEffect(
-        React.useCallback(() => {
+        useCallback(() => {
             fetchGroupDetails();
-        }, [groupId])
+        }, [fetchGroupDetails])
     );
 
     const copyToClipboard = async (text) => {
@@ -83,10 +99,12 @@ export const GroupDetails = ({ route, navigation }) => {
                     month,
                     year,
                     bet: bet
-                })
+                }),
+                lastAnnouncement: currentDate,
             });
 
             Alert.alert('Winner', `${winner.name} with the lowest total expense of $${winner.totalExpense.toFixed(2)}`);
+            fetchGroupDetails();
         } catch (error) {
             console.error('Error determining the winner:', error);
             Alert.alert('Error', 'Failed to determine the winner. Please try again later.');
@@ -138,10 +156,11 @@ export const GroupDetails = ({ route, navigation }) => {
                     <Text style={groupStyle.betText}>No bets placed yet.</Text>
                 )}
                 <View style={groupStyle.buttonContainer}>
-                    <Pressable style={friendStyle.button} onPress={() => navigation.navigate('Bets', { groupId })}>
+                    <Pressable style={friendStyle.button} onPress={() => navigation.navigate('Bets', { groupId, fetchGroupDetails })}>
                         <Text style={friendStyle.buttonText}>Vote/Place bets</Text>
                     </Pressable>
-                    <Pressable style={friendStyle.button} onPress={getWinner}>
+                    <Pressable style={[friendStyle.button, !canAnnounceWinner && { backgroundColor: 'grey' }]} 
+                            onPress={canAnnounceWinner ? getWinner : null}>
                         <Text style={friendStyle.buttonText}>Announce Current Month's Winner</Text>
                     </Pressable>
                     <Pressable style={friendStyle.button} onPress={() => navigation.navigate('WinnerLog', {groupId})}>
