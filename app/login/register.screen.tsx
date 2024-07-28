@@ -21,7 +21,9 @@ export const RegisterScn = ({ navigation }) => {
       Alert.alert("Success", "Registration successful. You can now log in.");
       navigation.navigate('Log in');
     } catch (error) {
-      if (error.code === 'auth/missing-password') {
+      if (error.message === 'auth/username-already-in-use') {
+        Alert.alert("Error", "This username is already in use.");
+      } else if (error.code === 'auth/missing-password') {
         Alert.alert("Error", "Password is required.");
       } else if (error.code === 'auth/email-already-in-use') {
         Alert.alert("Error", "This email address is already in use.");
@@ -63,10 +65,11 @@ export const RegisterScn = ({ navigation }) => {
               style={loginStyles.textIn}
               onChangeText={setPassword}
             />
-            <Button mode="contained" onPress={handleRegister}>Sign up</Button>
+            <Button mode="contained" onPress={handleRegister} style={loginStyles.buttonSpacing}>Sign up</Button>
           </Card.Content>
         </Card>
       </View>
     </ImageBackground>
   );
 };
+

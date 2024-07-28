@@ -4,7 +4,7 @@ import { doc, getDoc, getDocs, collection, updateDoc } from 'firebase/firestore'
 import { db, storage } from '../../config/firebaseConfig';
 import * as ImagePicker from 'expo-image-picker';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import {winnerLog } from './settings.screenstyle';
+import { winnerLog } from './settings.screenstyle';
 
 export const WinnerLog = ({ route }) => {
     const { groupId } = route.params;
@@ -116,7 +116,7 @@ export const WinnerLog = ({ route }) => {
                     <ActivityIndicator size="large" color="#0000ff" />
                     <Text>Uploading...</Text>
                 </View>
-            ) : fetchingImages? (
+            ) : fetchingImages ? (
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                     <ActivityIndicator size="large" color="#0000ff" />
                     <Text>Fetching Images...</Text>
@@ -131,4 +131,4 @@ export const WinnerLog = ({ route }) => {
             )}
         </SafeAreaView>
     );
-}
+};

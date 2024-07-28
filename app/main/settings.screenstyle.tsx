@@ -30,13 +30,8 @@ export const settStyle = StyleSheet.create({
         justifyContent: "center",
         flexDirection: 'row'
     }
-<<<<<<< HEAD
-});
-  
-=======
 })
  
->>>>>>> 4bdf6aabcaeaee2d4ea02789bb60e66575371837
 export const friendStyle = StyleSheet.create({
     container: {
         flex: 1,
@@ -110,73 +105,87 @@ export const friendStyle = StyleSheet.create({
 
 
 export const expenseStyle = StyleSheet.create({
-    container: {
-      flex: 1,
-      padding: 10,
-    },
-    card: {
-      marginBottom: 10,
-    },
-    textInput: {
-      marginBottom: 10,
-    },
-    button: {
-      marginTop: 10,
-    },
-    total: {
-      fontSize: 18,
-      fontWeight: 'bold',
-      marginBottom: 10,
-    },
-    categoryTotal: {
-      fontSize: 16,
-      fontWeight: 'bold',
-      marginTop: 10,
-    },
-    progressContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginTop: 10,
-    },
-    navBar: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      marginVertical: 10,
-    },
-    monthText: {
-      fontSize: 18,
-      fontWeight: 'bold',
-    },
-    categoryButtonsContainer: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      justifyContent: 'space-between',
-      marginVertical: 10,
-    },
-    categoryButton: {
-      marginBottom: 5,
-      flexBasis: '30%', // Adjust this value to control the button width
-      marginHorizontal: 2,
-    },
-    categoryButtonText: {
-      fontSize: 12, // Smaller font size for button text
-    },
-    expensesListContainer: {
-      flex: 1,
-      marginTop: -260,
-    },
-    actions: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      marginTop: 10,
-    },
-    item: {
-      padding: 10,
-      borderBottomWidth: 1,
-      borderBottomColor: '#ddd',
-    },
-  });
+  container: {
+    flex: 1,
+    padding: 10,
+  },
+  card: {
+    marginBottom: 10,
+  },
+  textInput: {
+    marginBottom: 10,
+  },
+  button: {
+    marginTop: 10,
+  },
+  total: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  categoryTotal: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginTop: 10,
+  },
+  progressContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  navBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginVertical: 10,
+  },
+  monthText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  categoryButtonsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginVertical: 10,
+  },
+  categoryButton: {
+    marginBottom: 5,
+    flexBasis: '30%', // Adjust this value to control the button width
+    marginHorizontal: 2,
+  },
+  categoryButtonText: {
+    fontSize: 12, // Smaller font size for button text
+  },
+  expensesListContainer: {
+    flex: 1,
+    marginTop: -230,
+  },
+  actions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
+  },
+  item: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+  },
+  itemText: {
+    flex: 1,
+    flexDirection: 'column',
+  },
+  itemButtons: {
+    flexDirection: 'row',
+  },
+  iconButton: {
+    marginLeft: 10,
+  },
+});
+
 
 export const groupStyle = StyleSheet.create({
     container: {

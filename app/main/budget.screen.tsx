@@ -3,6 +3,8 @@ import { View, Alert, ScrollView } from 'react-native';
 import { TextInput, Button, Card } from 'react-native-paper';
 import { AuthContext } from '../../authentication/authContext';
 import { expenseStyle } from './settings.screenstyle';
+import { doc, updateDoc } from 'firebase/firestore';
+import { db } from '../../config/firebaseConfig';
 
 const categories = ['Food', 'Health', 'Clothing', 'Household', 'Transport', 'Travel', 'Utilities', 'Entertainment', 'Payments', 'Personal', 'Others'];
 
@@ -10,10 +12,17 @@ export const BudgetScreen = ({ navigation }) => {
   const { state, setBudgets } = useContext(AuthContext);
   const [budgets, setLocalBudgets] = useState(state.budgets || {});
 
-  const handleSave = () => {
-    setBudgets(budgets);
-    Alert.alert("Success", "Budgets saved successfully.");
-    navigation.goBack();
+  const handleSave = async () => {
+    try {
+      const userRef = doc(db, 'users', state.user.uid); // Assuming state.user.uid contains the user ID
+      await updateDoc(userRef, { budgets });
+      setBudgets(budgets);
+      Alert.alert("Success", "Budgets saved successfully.");
+      navigation.goBack();
+    } catch (error) {
+      console.error("Error saving budgets:", error);
+      Alert.alert("Error", "Failed to save budgets.");
+    }
   };
 
   const handleInputChange = (text, category) => {

@@ -1,5 +1,4 @@
 import React, { useState, useContext } from 'react';
-import { auth } from '../../config/firebaseConfig';
 import { ImageBackground, SafeAreaView, ScrollView, View, Alert } from 'react-native';
 import { TextInput, Button, Card } from 'react-native-paper';
 import { loginStyles } from './login.screenstyle';
@@ -46,9 +45,9 @@ export const LoginScreen = ({ navigation }) => {
                   secureTextEntry
                   autoCapitalize="none"
                   onChangeText={setPassword}
+                  style={loginStyles.textIn}
                 />
-                <Button uppercase={false}>Forgot password?</Button>
-                <Button mode="contained" onPress={handleLogin}>Sign in</Button>
+                <Button mode="contained" onPress={handleLogin} style={loginStyles.buttonSpacing}>Sign in</Button>
                 <Button onPress={() => navigation.navigate("Register")}>Register now!</Button>
               </Card.Content>
             </Card>

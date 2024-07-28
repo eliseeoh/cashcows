@@ -47,29 +47,28 @@ function AppStack() {
       />
       <Stack.Screen
         name="AddExpense"
-        component={AddExp}
+        component={AddExp} 
+        options={{ title: 'Add Expense' }}
       />
       <Stack.Screen
         name="GroupDetails"
         component={GroupDetails}
+        options={{ title: 'Group Details' }}
       />
       <Stack.Screen
         name="Bets"
         component={BetScreen}
+        options={{ title: 'Bet Screen' }}
       />
       <Stack.Screen
         name="BudgetScreen"
         component={BudgetScreen}
+        options={{ title: 'Budget Screen' }}
       />
-<<<<<<< HEAD
-      <Stack.Screen
-        name="Profile"
-        component={Settings}
-=======
       <Stack.Screen 
         name="WinnerLog"
         component={WinnerLog}
->>>>>>> 4bdf6aabcaeaee2d4ea02789bb60e66575371837
+        options={{ title: 'Winner Log' }}
       />
     </Stack.Navigator>
   );

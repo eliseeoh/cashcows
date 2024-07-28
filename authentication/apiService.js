@@ -1,10 +1,21 @@
 import { auth, db, storage } from '../config/firebaseConfig';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, updateDoc, query, where, getDocs, collection } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+
+export const checkUsernameExists = async (username) => {
+  const q = query(collection(db, 'users'), where('username', '==', username));
+  const querySnapshot = await getDocs(q);
+  return !querySnapshot.empty;
+};
 
 export const registerUser = async (email, password, username) => {
   try {
+    const usernameExists = await checkUsernameExists(username);
+    if (usernameExists) {
+      throw new Error('auth/username-already-in-use');
+    }
+
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
     const token = await user.getIdToken(); // Retrieve the user's token
@@ -39,16 +50,16 @@ export const uploadProfilePicture = async (userId, imagePath) => {
     const storageRef = ref(storage, `profilePictures/${userId}`);
     const response = await fetch(imagePath);
     const blob = await response.blob();
-    await uploadBytes(storageRef, blob);
-
-    const photoURL = await getDownloadURL(storageRef);
+    const snapshot = await uploadBytes(storageRef, blob);
+    const photoURL = await getDownloadURL(snapshot.ref);
     await updateDoc(doc(db, "users", userId), { photoURL });
-
     return photoURL;
   } catch (error) {
+    console.error("Error uploading profile picture:", error);
     throw error;
   }
 };
+
 
 export const updateUserProfile = async (userId, profile) => {
   try {

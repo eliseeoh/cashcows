@@ -1,12 +1,12 @@
 import React, { createContext, useReducer, useEffect, useMemo } from 'react';
 import * as SecureStore from 'expo-secure-store';
-import { loginUser, registerUser, uploadProfilePicture, updateUserProfile } from './apiService';
+import { loginUser, registerUser, uploadProfilePicture, updateUserProfile } from './apiService'; // Ensure correct import
 import { auth, db } from '../config/firebaseConfig';
 import { doc, getDoc, getDocs, collection, updateDoc, deleteDoc, addDoc } from "firebase/firestore";
 
 const AuthContext = createContext();
 
-const initialExpenses = Array.from({ length: 12 }, () => []);
+const initialExpenses = {}; // Use an object to store expenses by year and month
 const initialBudgets = {}; // Initialize budgets
 
 const reducer = (prevState, action) => {
@@ -38,69 +38,116 @@ const reducer = (prevState, action) => {
         budgets: initialBudgets,
       };
     case 'ADD_EXPENSE':
-      const updatedExpenses = [...prevState.expenses];
+      const addYear = new Date(action.payload.expense.date).getFullYear();
       const addMonth = new Date(action.payload.expense.date).getMonth();
-      if (!updatedExpenses[addMonth]) {
-        updatedExpenses[addMonth] = [];
+      const updatedExpensesAdd = { ...prevState.expenses };
+
+      if (!updatedExpensesAdd[addYear]) {
+        updatedExpensesAdd[addYear] = Array.from({ length: 12 }, () => []);
       }
-      updatedExpenses[addMonth].push(action.payload.expense);
-      updatedExpenses[addMonth].sort((a, b) => new Date(b.date) - new Date(a.date));
+      if (!updatedExpensesAdd[addYear][addMonth]) {
+        updatedExpensesAdd[addYear][addMonth] = [];
+      }
+      updatedExpensesAdd[addYear][addMonth].push(action.payload.expense);
+      updatedExpensesAdd[addYear][addMonth].sort((a, b) => new Date(b.date) - new Date(a.date));
+
       return {
         ...prevState,
-        expenses: updatedExpenses,
+        expenses: updatedExpensesAdd,
       };
+
     case 'EDIT_EXPENSE':
       const editExpense = action.payload.expense;
+      const originalYear = new Date(action.payload.originalDate).getFullYear();
       const originalMonth = new Date(action.payload.originalDate).getMonth();
+      const newYear = new Date(editExpense.date).getFullYear();
       const newMonth = new Date(editExpense.date).getMonth();
-      const editedExpenses = [...prevState.expenses];
+      const updatedExpensesEdit = { ...prevState.expenses };
 
-      // Remove expense from the original month
-      if (originalMonth !== newMonth) {
-        editedExpenses[originalMonth] = editedExpenses[originalMonth].filter(exp => exp.id !== editExpense.id);
+      // Remove expense from the original month and year
+      if (originalYear !== newYear || originalMonth !== newMonth) {
+        updatedExpensesEdit[originalYear][originalMonth] = updatedExpensesEdit[originalYear][originalMonth].filter(
+          (exp) => exp.id !== editExpense.id
+        );
       }
 
-      // Add or update expense in the new month
-      if (!editedExpenses[newMonth]) {
-        editedExpenses[newMonth] = [];
+      // Add or update expense in the new month and year
+      if (!updatedExpensesEdit[newYear]) {
+        updatedExpensesEdit[newYear] = Array.from({ length: 12 }, () => []);
       }
-      const expenseIndex = editedExpenses[newMonth].findIndex(exp => exp.id === editExpense.id);
+      if (!updatedExpensesEdit[newYear][newMonth]) {
+        updatedExpensesEdit[newYear][newMonth] = [];
+      }
+      const expenseIndex = updatedExpensesEdit[newYear][newMonth].findIndex((exp) => exp.id === editExpense.id);
       if (expenseIndex !== -1) {
-        editedExpenses[newMonth][expenseIndex] = editExpense;
+        updatedExpensesEdit[newYear][newMonth][expenseIndex] = editExpense;
       } else {
-        editedExpenses[newMonth].push(editExpense);
+        updatedExpensesEdit[newYear][newMonth].push(editExpense);
       }
-      editedExpenses[newMonth].sort((a, b) => new Date(b.date) - new Date(a.date));
+      updatedExpensesEdit[newYear][newMonth].sort((a, b) => new Date(b.date) - new Date(a.date));
 
       return {
         ...prevState,
-        expenses: editedExpenses,
+        expenses: updatedExpensesEdit,
       };
+
     case 'DELETE_EXPENSE':
-      const filteredExpenses = [...prevState.expenses];
+      const deleteYear = new Date(action.payload.date).getFullYear();
       const deleteMonth = new Date(action.payload.date).getMonth();
-      filteredExpenses[deleteMonth] = filteredExpenses[deleteMonth].filter(exp => exp.id !== action.payload.id);
+      const updatedExpensesDelete = { ...prevState.expenses };
+
+      updatedExpensesDelete[deleteYear][deleteMonth] = updatedExpensesDelete[deleteYear][deleteMonth].filter(
+        (exp) => exp.id !== action.payload.id
+      );
+
       return {
         ...prevState,
-        expenses: filteredExpenses,
+        expenses: updatedExpensesDelete,
       };
+
     case 'SET_EXPENSES':
       return {
         ...prevState,
         expenses: action.expenses,
       };
+
     case 'SET_BUDGETS':
       return {
         ...prevState,
         budgets: action.budgets,
       };
+
     case 'UPDATE_PROFILE':
       return {
         ...prevState,
         user: { ...prevState.user, ...action.payload },
       };
+
     default:
       return prevState;
+  }
+};
+
+const fetchUserExpenses = async (userId, dispatch) => {
+  try {
+    const querySnapshot = await getDocs(collection(db, "users", userId, "expenses"));
+    const expenses = {};
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      const year = new Date(data.date).getFullYear();
+      const month = new Date(data.date).getMonth();
+
+      if (!expenses[year]) {
+        expenses[year] = Array.from({ length: 12 }, () => []);
+      }
+      if (!expenses[year][month]) {
+        expenses[year][month] = [];
+      }
+      expenses[year][month].push({ ...data, id: doc.id });
+    });
+    dispatch({ type: 'SET_EXPENSES', expenses });
+  } catch (error) {
+    console.error('Error fetching user expenses:', error);
   }
 };
 
@@ -130,6 +177,10 @@ const AuthProvider = ({ children }) => {
         if (userId) {
           const userDoc = await getDoc(doc(db, "users", userId));
           user = { uid: userId, ...userDoc.data() };
+
+          // Fetch and set budgets
+          const budgets = userDoc.data().budgets || {};
+          dispatch({ type: 'SET_BUDGETS', budgets });
         }
 
         console.log('Bootstrap userToken:', userToken);
@@ -139,32 +190,29 @@ const AuthProvider = ({ children }) => {
       }
 
       if (userToken && userId) {
-        fetchUserExpenses(userId);
+        fetchUserExpenses(userId, dispatch);
       }
 
-      dispatch({ type: 'RESTORE_TOKEN', token: userToken, userId, user });
+      dispatch({
+        type: 'RESTORE_TOKEN', token: userToken, userId, user });
     };
 
     bootstrapAsync();
   }, []);
 
-  const fetchUserExpenses = async (userId) => {
-    try {
-      const querySnapshot = await getDocs(collection(db, "users", userId, "expenses"));
-      const expenses = Array.from({ length: 12 }, () => []);
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        const month = new Date(data.date).getMonth();
-        expenses[month].push({ ...data, id: doc.id });
-      });
-      dispatch({ type: 'SET_EXPENSES', expenses });
-    } catch (error) {
-      console.error('Error fetching user expenses:', error);
+  const setBudgets = async (budgets) => {
+    const { userId } = state;
+    if (!userId) {
+      console.error('User ID is null, cannot set budgets.');
+      return;
     }
-  };
-
-  const setBudgets = (budgets) => {
-    dispatch({ type: 'SET_BUDGETS', budgets });
+    console.log('Setting budgets for user:', userId);
+    try {
+      await updateDoc(doc(db, "users", userId), { budgets });
+      dispatch({ type: 'SET_BUDGETS', budgets });
+    } catch (error) {
+      console.error('Error setting budgets:', error);
+    }
   };
 
   const addExpense = async (expense) => {
@@ -214,39 +262,35 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-  const updateUserProfile = async (userId, profile) => {
-    try {
-      await updateDoc(doc(db, "users", userId), profile);
-      dispatch({ type: 'UPDATE_PROFILE', payload: profile });
-    } catch (error) {
-      console.error('Error updating user profile:', error);
-      throw error;
-    }
-  };
-
   const authContext = useMemo(() => ({
     signIn: async (email, password) => {
       try {
-        const { user, token, username } = await loginUser(email, password);
+        const { user, token } = await loginUser(email, password);
         await SecureStore.setItemAsync('userToken', JSON.stringify(token));
         await SecureStore.setItemAsync('userId', JSON.stringify(user.uid));
-        fetchUserExpenses(user.uid);
+        await fetchUserExpenses(user.uid, dispatch);
         const userDoc = await getDoc(doc(db, "users", user.uid));
+        const budgets = userDoc.data().budgets || {};
         dispatch({ type: 'SIGN_IN', token, userId: user.uid, user: { ...user, ...userDoc.data() } });
+        dispatch({ type: 'SET_BUDGETS', budgets });
       } catch (error) {
         console.error('Sign in failed:', error);
+        throw error;
       }
     },
     signUp: async (email, password, username) => {
       try {
-        const { user, token } = await registerUser(email, password, username); // Ensure this returns both user and token
+        const { user, token } = await registerUser(email, password, username);
         await SecureStore.setItemAsync('userToken', JSON.stringify(token));
         await SecureStore.setItemAsync('userId', JSON.stringify(user.uid));
-        fetchUserExpenses(user.uid);
+        await fetchUserExpenses(user.uid, dispatch);
         const userDoc = await getDoc(doc(db, "users", user.uid));
+        const budgets = userDoc.data().budgets || {};
         dispatch({ type: 'SIGN_IN', token, userId: user.uid, user: { ...user, ...userDoc.data() } });
+        dispatch({ type: 'SET_BUDGETS', budgets });
       } catch (error) {
         console.error('Sign up failed:', error);
+        throw error;
       }
     },
     signOut: async () => {
@@ -275,3 +319,4 @@ const AuthProvider = ({ children }) => {
 
 export { AuthContext, AuthProvider };
 
+   
