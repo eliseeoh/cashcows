@@ -1,13 +1,13 @@
 import React, { createContext, useReducer, useEffect, useMemo } from 'react';
 import * as SecureStore from 'expo-secure-store';
-import { loginUser, registerUser, uploadProfilePicture, updateUserProfile } from './apiService'; // Ensure correct import
+import { loginUser, registerUser, uploadProfilePicture as uploadProfilePictureAPI, updateUserProfile } from './apiService';
 import { auth, db } from '../config/firebaseConfig';
 import { doc, getDoc, getDocs, collection, updateDoc, deleteDoc, addDoc } from "firebase/firestore";
 
 const AuthContext = createContext();
 
-const initialExpenses = {}; // Use an object to store expenses by year and month
-const initialBudgets = {}; // Initialize budgets
+const initialExpenses = {};
+const initialBudgets = {};
 
 const reducer = (prevState, action) => {
   switch (action.type) {
@@ -64,14 +64,12 @@ const reducer = (prevState, action) => {
       const newMonth = new Date(editExpense.date).getMonth();
       const updatedExpensesEdit = { ...prevState.expenses };
 
-      // Remove expense from the original month and year
       if (originalYear !== newYear || originalMonth !== newMonth) {
         updatedExpensesEdit[originalYear][originalMonth] = updatedExpensesEdit[originalYear][originalMonth].filter(
           (exp) => exp.id !== editExpense.id
         );
       }
 
-      // Add or update expense in the new month and year
       if (!updatedExpensesEdit[newYear]) {
         updatedExpensesEdit[newYear] = Array.from({ length: 12 }, () => []);
       }
@@ -130,13 +128,6 @@ const reducer = (prevState, action) => {
   }
 };
 
-const updateProfilePicture = async (userId, photoURL) => {
-  dispatch({
-    type: 'UPDATE_PROFILE_PICTURE',
-    payload: { photoURL },
-  });
-};
-
 const fetchUserExpenses = async (userId, dispatch) => {
   try {
     const querySnapshot = await getDocs(collection(db, "users", userId, "expenses"));
@@ -168,7 +159,7 @@ const AuthProvider = ({ children }) => {
     userId: null,
     user: null,
     expenses: initialExpenses,
-    budgets: initialBudgets, // Initialize budgets
+    budgets: initialBudgets,
   });
 
   useEffect(() => {
@@ -187,13 +178,9 @@ const AuthProvider = ({ children }) => {
           const userDoc = await getDoc(doc(db, "users", userId));
           user = { uid: userId, ...userDoc.data() };
 
-          // Fetch and set budgets
           const budgets = userDoc.data().budgets || {};
           dispatch({ type: 'SET_BUDGETS', budgets });
         }
-
-        console.log('Bootstrap userToken:', userToken);
-        console.log('Bootstrap userId:', userId);
       } catch (e) {
         console.log('Restoring token failed:', e);
       }
@@ -215,7 +202,6 @@ const AuthProvider = ({ children }) => {
       console.error('User ID is null, cannot set budgets.');
       return;
     }
-    console.log('Setting budgets for user:', userId);
     try {
       await updateDoc(doc(db, "users", userId), { budgets });
       dispatch({ type: 'SET_BUDGETS', budgets });
@@ -230,8 +216,6 @@ const AuthProvider = ({ children }) => {
       console.error('User ID is null, cannot add expense.');
       return;
     }
-    console.log('Adding expense for user:', userId);
-    console.log('Expense:', expense);
     try {
       const docRef = await addDoc(collection(db, "users", userId, "expenses"), expense);
       dispatch({ type: 'ADD_EXPENSE', payload: { expense: { ...expense, id: docRef.id } } });
@@ -246,8 +230,6 @@ const AuthProvider = ({ children }) => {
       console.error('User ID is null, cannot edit expense.');
       return;
     }
-    console.log('Editing expense for user:', userId);
-    console.log('Expense:', expense);
     try {
       await updateDoc(doc(db, "users", userId, "expenses", expense.id), expense);
       dispatch({ type: 'EDIT_EXPENSE', payload: { expense, originalDate } });
@@ -262,12 +244,28 @@ const AuthProvider = ({ children }) => {
       console.error('User ID is null, cannot delete expense.');
       return;
     }
-    console.log('Deleting expense for user:', userId);
     try {
       await deleteDoc(doc(db, "users", userId, "expenses", expenseId));
       dispatch({ type: 'DELETE_EXPENSE', payload: { id: expenseId, date: expenseDate } });
     } catch (error) {
       console.error('Error deleting expense:', error);
+    }
+  };
+
+  const updateProfilePicture = async (photoURL) => {
+    const { userId } = state;
+    if (!userId) {
+      console.error('User ID is null, cannot update profile picture.');
+      return;
+    }
+    try {
+      await uploadProfilePictureAPI(userId, photoURL);
+      dispatch({
+        type: 'UPDATE_PROFILE_PICTURE',
+        payload: { photoURL },
+      });
+    } catch (error) {
+      console.error('Error updating profile picture:', error);
     }
   };
 
@@ -315,7 +313,7 @@ const AuthProvider = ({ children }) => {
     editExpense,
     deleteExpense,
     setBudgets,
-    uploadProfilePicture,
+    uploadProfilePicture: uploadProfilePictureAPI, // Ensure this is defined
     updateUserProfile,
     updateProfilePicture,
   }), [state]);
@@ -328,5 +326,3 @@ const AuthProvider = ({ children }) => {
 };
 
 export { AuthContext, AuthProvider };
-
-   
