@@ -14,7 +14,9 @@ const Analytics = () => {
   const { expenses, budgets } = state;
   const [data, setData] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
+  const years = Array.from({ length: 20 }, (_, i) => selectedYear - 10 + i);
 
   const months = [
     'January', 'February', 'March', 'April', 'May', 'June',
@@ -22,7 +24,7 @@ const Analytics = () => {
   ];
 
   useEffect(() => {
-    const currentMonthExpenses = expenses[new Date().getFullYear()]?.[selectedMonth] || [];
+    const currentMonthExpenses = expenses[selectedYear]?.[selectedMonth] || [];
     const groupedExpenses = currentMonthExpenses.reduce((acc, expense) => {
       if (!acc[expense.category]) {
         acc[expense.category] = 0;
@@ -40,7 +42,7 @@ const Analytics = () => {
     }));
 
     setData(chartData);
-  }, [expenses, selectedMonth]);
+  }, [expenses, selectedMonth, selectedYear]);
 
   const shadesOfGrey = [
     '#000000', '#DCDCDC', '#808080', '#696969', '#778899',
@@ -68,20 +70,39 @@ const Analytics = () => {
   return (
     <ScrollView style={expenseStyle.container}>
       <Text style={groupStyle.title}>Expenses by Category</Text>
-        <Text style={groupStyle.subtitle}>Select Month: </Text>
-      <View style={analytics.pickerWrapper}>
-        <Picker
-          selectedValue={selectedMonth}
-          style={analytics.dropdown}
-          onValueChange={(itemValue) => {
-            setSelectedMonth(itemValue);
-            setSelectedCategory(null);
-        }}
-        >
-          {months.map((month, index) => (
-            <Picker.Item key={index} label={month} value={index} />
-          ))}
-        </Picker>
+      <View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
+        <View>
+            <Text style={groupStyle.subtitle}>Select Month: </Text>
+            <View style={analytics.pickerWrapper}>
+                <Picker
+                selectedValue={selectedMonth}
+                onValueChange={(itemValue) => {
+                    setSelectedMonth(itemValue);
+                    setSelectedCategory(null);
+                }}
+                >
+                {months.map((month, index) => (
+                    <Picker.Item key={index} label={month} value={index} />
+                ))}
+                </Picker>
+            </View>
+        </View>
+        <View>
+            <Text style={groupStyle.subtitle}>Select Year: </Text>
+            <View style={analytics.pickerWrapper}>
+                <Picker
+                selectedValue={selectedYear}
+                onValueChange={(itemValue) => {
+                    setSelectedYear(itemValue);
+                    setSelectedCategory(null);
+                }}
+                >
+                {years.map((year, index) => (
+                    <Picker.Item key={index} label={`${year}`} value={year} />
+                ))}
+                </Picker>
+            </View>
+        </View>
       </View>
       {data.length > 0 ? (
         <View>

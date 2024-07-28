@@ -461,14 +461,14 @@ export const analytics = StyleSheet.create({
   },
   picker: {
     height: 50,
-    width: '100%',
     marginVertical: 10,
-    borderColor: 'black'
+    borderColor: 'black',
   },
   pickerWrapper: {
     borderColor: 'black',
     borderWidth: 1,
     borderRadius: 4,
     overflow: 'hidden',
+    width: 150
   },
 })
