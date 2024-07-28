@@ -1,13 +1,14 @@
 import React, { useState, useContext } from 'react';
-import { ImageBackground, SafeAreaView, ScrollView, View, Alert } from 'react-native';
-import { TextInput, Button, Card } from 'react-native-paper';
+import { Image, SafeAreaView, ScrollView, View, Alert, TextInput, Text, Pressable, ActivityIndicator} from 'react-native';
 import { loginStyles } from './login.screenstyle';
 import { AuthContext } from '../../authentication/authContext';
+import loginImage from '../../assets/images/cashciws.png'
 
 export const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { signIn } = useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
     console.log('handleLogin called');
@@ -19,41 +20,63 @@ export const LoginScreen = ({ navigation }) => {
       return;
     }
 
+    setLoading(true);
     try {
       await signIn(email, password); // Call signIn from AuthContext
+
     } catch (error) {
       console.error("Error signing in:", error);
       Alert.alert("Error", "Failed to sign in. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
+
+  if (loading) {
+    return (
+        <SafeAreaView style={loginStyles.appContainer}>
+            <View style={loginStyles.loadingContainer}>
+                <ActivityIndicator size="large" color="#000000" />
+                <Text style={loginStyles.loadingText}>Logging in...</Text>
+            </View>
+        </SafeAreaView>
+    );
+}
   return (
     <SafeAreaView style={loginStyles.appContainer}>
-      <ImageBackground style={loginStyles.image} source={require('../../assets/images/login/background.png')}>
-        <ScrollView contentContainerStyle={loginStyles.scrollV}>
-          <View style={loginStyles.viewReg}>
-            <Card>
-              <Card.Title title="Log in" titleStyle={loginStyles.centerT} />
-              <Card.Content>
-                <TextInput 
-                  label="Email"
-                  autoCapitalize="none"
-                  onChangeText={setEmail}
-                />
-                <TextInput 
-                  label="Password"
-                  secureTextEntry
-                  autoCapitalize="none"
-                  onChangeText={setPassword}
-                  style={loginStyles.textIn}
-                />
-                <Button mode="contained" onPress={handleLogin} style={loginStyles.buttonSpacing}>Sign in</Button>
-                <Button onPress={() => navigation.navigate("Register")}>Register now!</Button>
-              </Card.Content>
-            </Card>
+      <ScrollView contentContainerStyle={loginStyles.scrollV}>
+        <View style={loginStyles.viewReg}>
+          <Image 
+            source={loginImage} 
+            style={loginStyles.image} 
+          />
+          <View style={loginStyles.inputCont}>
+            <Text style={loginStyles.title}>Log in</Text>
+            <TextInput 
+              placeholder="Email"
+              placeholderTextColor="#999"
+              autoCapitalize="none"
+              onChangeText={setEmail}
+              style={loginStyles.textInput}
+            />
+            <TextInput 
+              placeholder="Password"
+              placeholderTextColor="#999"
+              secureTextEntry
+              autoCapitalize="none"
+              onChangeText={setPassword}
+              style={[loginStyles.textInput, loginStyles.passwordInput]}
+            />
+            <Pressable onPress={handleLogin} style={loginStyles.button}>
+              <Text style={loginStyles.buttonText}>Sign In</Text>
+            </Pressable>
+            <Pressable onPress={() => navigation.navigate("Register")} style={loginStyles.registerButton}>
+              <Text style={loginStyles.registerButtonText}>Register now!</Text>
+            </Pressable>
           </View>
-        </ScrollView>
-      </ImageBackground>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };

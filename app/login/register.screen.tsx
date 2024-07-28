@@ -1,8 +1,9 @@
 import React, { useState, useContext } from 'react';
-import { View, Alert, ImageBackground } from 'react-native';
+import { View, Alert, SafeAreaView, Image, ScrollView, Pressable, Text} from 'react-native';
 import { TextInput, Button, Card } from 'react-native-paper';
 import { AuthContext } from '../../authentication/authContext';
 import { loginStyles } from './login.screenstyle';
+import loginImage from '../../assets/images/cashciws.png'
 
 export const RegisterScn = ({ navigation }) => {
   const { signUp } = useContext(AuthContext);
@@ -38,38 +39,44 @@ export const RegisterScn = ({ navigation }) => {
   };
 
   return (
-    <ImageBackground 
-        style={loginStyles.image}
-        source={require('../../assets/images/login/background.png')}
-        resizeMode='cover'>
+    <SafeAreaView style={loginStyles.regAC}>
+      <ScrollView contentContainerStyle={loginStyles.scrollV}>
       <View style={loginStyles.viewReg}>
-        <Card>
-          <Card.Title title="Register!" titleStyle={loginStyles.centerT} />
-          <Card.Content>
+          <Image 
+            source={loginImage} 
+            style={loginStyles.image} 
+          />
+          <View style={loginStyles.inputCont}>
+            <Text style={loginStyles.title}>Register!</Text>
             <TextInput 
-              label="Username"
-              style={loginStyles.textIn}
+              placeholder="Username"
+              placeholderTextColor="#999"
+              autoCapitalize="none"
               onChangeText={setUsername}
+              style={loginStyles.regTI}
             />
             <TextInput 
-              label="Email"
-              keyboardType='email-address'
-              autoCapitalize='none'
-              style={loginStyles.textIn}
+              placeholder="Email"
+              placeholderTextColor="#999"
+              secureTextEntry
+              autoCapitalize="none"
               onChangeText={setEmail}
+              style={loginStyles.regTI}
             />
             <TextInput 
-              label="Password"
-              secureTextEntry={true}
-              autoCapitalize='none'
-              style={loginStyles.textIn}
+              placeholder="Password"
+              placeholderTextColor="#999"
+              autoCapitalize="none"
               onChangeText={setPassword}
+              style={[loginStyles.regTI, loginStyles.passwordInput]}
             />
-            <Button mode="contained" onPress={handleRegister} style={loginStyles.buttonSpacing}>Sign up</Button>
-          </Card.Content>
-        </Card>
-      </View>
-    </ImageBackground>
+            <Pressable onPress={handleRegister} style={loginStyles.button}>
+              <Text style={loginStyles.buttonText}>Sign Up</Text>
+            </Pressable>
+          </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
