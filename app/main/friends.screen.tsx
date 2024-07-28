@@ -1,9 +1,9 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Text, Button, SafeAreaView, ScrollView, View, Alert, TextInput, Modal, Pressable, TouchableOpacity } from "react-native";
+import { Text, Button, SafeAreaView, ScrollView, View, Alert, TextInput, Modal, Pressable, TouchableOpacity, ActivityIndicator } from "react-native";
 import { AuthContext } from '../../authentication/authContext'; 
 import { db } from '../../config/firebaseConfig';
 import { collection, query, where, getDocs, getDoc, doc, updateDoc, setDoc, serverTimestamp, arrayUnion } from 'firebase/firestore';
-import { friendStyle } from './settings.screenstyle';
+import { friendStyle, groupStyle } from './settings.screenstyle';
 
 export const Friends = ({ navigation }) => {
     const { state } = useContext(AuthContext); 
@@ -48,7 +48,10 @@ export const Friends = ({ navigation }) => {
     if (loading) {
         return (
             <SafeAreaView style={friendStyle.container}>
-                <Text>Loading...</Text>
+                <View style={groupStyle.loadingContainer}>
+                    <ActivityIndicator size="large" color="#000000" />
+                    <Text style={groupStyle.loadingText}>Loading...</Text>
+                </View>
             </SafeAreaView>
         );
     }
@@ -171,18 +174,17 @@ export const Friends = ({ navigation }) => {
                                 value={inputText}
                                 placeholder="Group ID"
                             />
-                            <Button
-                                title="Join"
-                                onPress={joinGroup}
-                            />
-                            <Button
-                                title="Cancel"
-                                onPress={() => {
-                                    setModalVisible(false)
-                                    setInputText('')
-                                }}
-                                color="red"
-                            />
+                            <View style={{flexDirection: 'row', justifyContent: 'center'}}>
+                                <Pressable style={friendStyle.cancelButton} onPress={joinGroup}>
+                                    <Text style={friendStyle.cancelText}>Join</Text>
+                                </Pressable>
+                                <Pressable style= {friendStyle.cancelButton} onPress={() => { 
+                                        setModalVisible(false)
+                                        setInputText('')
+                                    }}>
+                                    <Text style={friendStyle.cancelText}>Cancel</Text>
+                                </Pressable>
+                            </View>
                         </View>
                     </View>
                 </Modal>
@@ -197,20 +199,22 @@ export const Friends = ({ navigation }) => {
                         <View style={friendStyle.modalContent}>
                             <Text>Enter Group Name:</Text>
                             <TextInput
-                                style={{ height: 40, borderColor: 'gray', borderWidth: 1, marginBottom: 10 }}
+                                style={friendStyle.input}
                                 onChangeText={setGroupName}
                                 value={groupName}
                                 placeholder="Group Name"
                             />
-                            <Button
-                                title="Create"
-                                onPress={createGroup}
-                            />
-                            <Button
-                                title="Cancel"
-                                onPress={() => setCreateModalVisible(false)}
-                                color="red"
-                            />
+                            <View style={{flexDirection: 'row', justifyContent: 'center'}}>
+                                <Pressable style={friendStyle.cancelButton} onPress={createGroup}>
+                                    <Text style={friendStyle.cancelText}>Create</Text>
+                                </Pressable>
+                                <Pressable style= {friendStyle.cancelButton} onPress={() => { 
+                                        setCreateModalVisible(false)
+                                        setInputText('')
+                                    }}>
+                                    <Text style={friendStyle.cancelText}>Cancel</Text>
+                                </Pressable>
+                            </View>
                         </View>
                     </View>
                 </Modal>

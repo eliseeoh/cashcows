@@ -12,6 +12,7 @@ import { AddExp } from './app/main/addexpense.screen';
 import { GroupDetails } from './app/main/groupdetails.screen';
 import { BetScreen } from './app/main/bets.screen';
 import { BudgetScreen } from './app/main/budget.screen';
+import { WinnerLog } from './app/main/winnerlog.screen';
 
 const Stack = createNativeStackNavigator();
 
@@ -59,6 +60,10 @@ function AppStack() {
       <Stack.Screen
         name="BudgetScreen"
         component={BudgetScreen}
+      />
+      <Stack.Screen 
+        name="WinnerLog"
+        component={WinnerLog}
       />
     </Stack.Navigator>
   );

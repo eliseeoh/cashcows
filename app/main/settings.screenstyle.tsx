@@ -27,77 +27,12 @@ export const settStyle = StyleSheet.create({
         flexDirection: 'row'
     }
 })
-
-/* export const expenseStyle = StyleSheet.create({
-    container: {
-      flex: 1,
-      paddingTop: 25,
-      paddingHorizontal: 20,
-      position: 'relative',
-    },
-    navBar: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginBottom: 20,
-    },
-    monthText: {
-      fontSize: 20,
-      fontWeight: 'bold',
-    },
-    item: {
-      padding: 15,
-      borderBottomWidth: 1,
-      borderBottomColor: '#ccc',
-    },
-    total: {
-      fontSize: 18,
-      fontWeight: 'bold',
-      padding: 10,
-      textAlign: 'center',
-      color: 'red',
-    },
-    textInput: {
-      marginBottom: 15,
-    },
-    dropdown: {
-      marginBottom: 15,
-    },
-    dropdownContainer: {
-      marginBottom: 15,
-    },
-    categoryButtonsContainer: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      justifyContent: 'space-around',
-      marginVertical: 0,
-    },
-    categoryButton: {
-      margin: 5,
-    },
-    expensesListContainer: {
-      flex: 1,
-      marginTop: -180,
-    },
-    categoryTotal: {
-      fontSize: 18,
-      fontWeight: 'bold',
-      padding: 10,
-      textAlign: 'center',
-      color: 'blue',
-    },
-    add: {
-      padding: 10,
-      alignItems: 'center',
-    },
-  });
-  */
-  
+ 
 export const friendStyle = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#f0f0f0',
-        padding: 20,
+        margin: 20, 
     },
     groupContainer: {
         backgroundColor: '#fff',
@@ -114,14 +49,14 @@ export const friendStyle = StyleSheet.create({
     },
     groupText: {
         fontSize: 18,
-        fontWeight: '500',
+        fontWeight: '700'
     },
     button: {
         marginVertical: 10,
         padding: 15,
-        backgroundColor: '#6CBDE9',
-        borderRadius: 8,
-        alignItems: 'center',
+        backgroundColor: '#000000',
+        borderRadius: 12,
+        alignItems: 'center'
     },
     buttonText: {
         color: '#fff',
@@ -142,19 +77,26 @@ export const friendStyle = StyleSheet.create({
     },
     input: {
         height: 40,
-        borderColor: 'gray',
+        borderColor: 'black',
         borderWidth: 1,
         marginBottom: 10,
         paddingHorizontal: 10,
         borderRadius: 5,
     },
     cancelButton: {
-        backgroundColor: 'red',
-        marginTop: 10,
-        padding: 15,
+        backgroundColor: 'black',
+        marginTop: 7,
+        marginLeft: 8,
+        padding: 11,
+        width: '50%',
         borderRadius: 8,
         alignItems: 'center',
     },
+    cancelText: {
+        color: '#fff',
+        fontSize: 14,
+        fontWeight: 'bold',
+    }
 });
 
 
@@ -231,24 +173,54 @@ export const groupStyle = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#f0f0f0',
-        padding: 20,
+        margin: 20,
     },
     title: {
         fontSize: 24,
         fontWeight: 'bold',
-        marginBottom: 20,
+        marginBottom: 5,
     },
     subtitle: {
         fontSize: 18,
-        marginBottom: 10,
+        marginBottom: 5,
+        marginRight: 5,
+        marginTop: 5
     },
     betText: {
-        fontSize: 16,
-        marginBottom: 8
+        fontSize: 18,
+        marginTop: 4,
+        fontWeight: 'bold',
+        color: '#333',
     },
     memberContainer: {
         backgroundColor: '#fff',
         padding: 15,
+        borderRadius: 8,
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowRadius: 5,
+        elevation: 3,
+        marginBottom: 10, 
+    },
+    memberText: {
+        fontSize: 16,
+    },
+    buttonContainer: {
+        marginTop: 20,
+    },
+    button: {
+        marginBottom: 10,
+    },
+    groupId: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 10,
+    },
+    betCont: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      backgroundColor: '#fff',
+        padding: 13,
         marginVertical: 8,
         borderRadius: 8,
         shadowColor: '#000',
@@ -256,8 +228,15 @@ export const groupStyle = StyleSheet.create({
         shadowRadius: 5,
         elevation: 3,
     },
-    memberText: {
-        fontSize: 16,
+    loadingContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    loadingText: {
+        marginTop: 10,
+        fontSize: 18,
+        color: '#000',
     },
 });
 
@@ -271,8 +250,7 @@ export const betStyle = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: 15,
-        paddingVertical: 10,
+        padding: 15,
         borderBottomWidth: 1,
         borderBottomColor: '#cccccc',
     },
@@ -284,7 +262,7 @@ export const betStyle = StyleSheet.create({
     },
     input: {
         height: 40,
-        borderColor: '#cccccc',
+        borderColor: '#000000',
         borderWidth: 1,
         marginBottom: 10,
         paddingHorizontal: 10,
@@ -295,4 +273,63 @@ export const betStyle = StyleSheet.create({
         marginBottom: 8,
         marginRight: 10
     },
+    button: {
+      padding: 10,
+      backgroundColor: '#000000',
+      borderRadius: 100,
+      alignItems: 'center',
+      width: 60, 
+      height: 40,
+      justifyContent: 'center',
+  },
 });
+
+export const winnerLog = StyleSheet.create({
+  bigContainer: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  textContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+  },
+  itemText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  itemDescription: {
+      marginTop: 5,
+      fontSize: 16,
+  },
+  button: {
+    marginVertical: 10,
+    padding: 10,
+    backgroundColor: '#000000',
+    borderRadius: 20,
+    width: '30%',
+    alignItems: 'center'
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  image: {
+    width: '100%',
+    height: 200,
+    marginTop: 10,
+  },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#ffffff', // Customize as needed
+  },
+  text: {
+    marginTop: 10,
+    fontSize: 18,
+    color: '#000',
+  },
+})

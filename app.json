@@ -1,4 +1,6 @@
 {
+  "name": "cashcows",
+  "displayName": "CashCows",
   "expo": {
     "name": "cashcows",
     "slug": "cashcows",
@@ -29,7 +31,8 @@
     },
     "plugins": [
       "expo-router",
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true
