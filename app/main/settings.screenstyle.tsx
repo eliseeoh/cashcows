@@ -114,9 +114,25 @@ export const expenseStyle = StyleSheet.create({
   },
   textInput: {
     marginBottom: 10,
+    backgroundColor: '#f2f2f2',
   },
   button: {
     marginTop: 10,
+    backgroundColor: 'black',
+  },
+  buttonLabel: {
+    color: 'white', // Set the button text color to white for contrast
+  },
+  smallButton: {
+    backgroundColor: 'black',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  smallButtonText: {
+    color: 'white',
+    fontSize: 14,
   },
   total: {
     fontSize: 18,
@@ -142,6 +158,7 @@ export const expenseStyle = StyleSheet.create({
   monthText: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: 'black',
   },
   categoryButtonsContainer: {
     flexDirection: 'row',
@@ -153,9 +170,11 @@ export const expenseStyle = StyleSheet.create({
     marginBottom: 5,
     flexBasis: '30%', // Adjust this value to control the button width
     marginHorizontal: 2,
+    backgroundColor: 'black', 
   },
   categoryButtonText: {
     fontSize: 12, // Smaller font size for button text
+    color: 'white',
   },
   expensesListContainer: {
     flex: 1,
@@ -177,15 +196,22 @@ export const expenseStyle = StyleSheet.create({
   itemText: {
     flex: 1,
     flexDirection: 'column',
+    color: 'black',
   },
   itemButtons: {
     flexDirection: 'row',
   },
   iconButton: {
     marginLeft: 10,
+    color: 'black',
+  },
+  dropdown: {
+    backgroundColor: '#f2f2f2', // Set faint grey background
+  },
+  dropdownContainer: {
+    backgroundColor: '#f2f2f2', // Set faint grey background
   },
 });
-
 
 export const groupStyle = StyleSheet.create({
     container: {

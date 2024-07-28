@@ -17,7 +17,7 @@ export const Settings = ({ navigation }) => {
       });
     }
     setLoading(false);
-  }, [state.user]);
+  }, [state.user]); // Ensure the component re-renders when state.user changes
 
   const handleLogout = () => {
     signOut();

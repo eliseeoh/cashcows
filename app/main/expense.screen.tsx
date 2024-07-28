@@ -14,7 +14,7 @@ const months = [
   'July', 'August', 'September', 'October', 'November', 'December'
 ];
 
-const categories = ['Food', 'Health', 'Clothing', 'Household', 'Transport', 'Travel', 'Utilities', 'Entertainment', 'Payments', 'Personal', 'Others'];
+const categories = ['Food', 'Health', 'Clothing', 'Household', 'Transport', 'Travel', 'Utilities', 'Entertainment', 'Payments', 'Personal', 'Gifts', 'Miscellaneous'];
 
 export const Exp = ({ navigation }) => {
   const { state, deleteExpense } = useContext(AuthContext);
@@ -103,19 +103,18 @@ export const Exp = ({ navigation }) => {
         <Button
           mode="text"
           onPress={() => navigation.navigate("AddExpense", { expense: item })}
+          icon={() => <MaterialCommunityIcons name="pencil" size={24} color="black" />}
           style={expenseStyle.iconButton}
-          icon="pencil"
         />
         <Button
           mode="text"
           onPress={() => handleDelete(item.id, item.date)}
+          icon={() => <MaterialCommunityIcons name="trash-can" size={24} color="black" />}
           style={expenseStyle.iconButton}
-          icon="trash-can"
         />
       </View>
     </View>
   );
-  
 
   const renderCategoryButtons = () => {
     return (
@@ -127,6 +126,7 @@ export const Exp = ({ navigation }) => {
             setCategoryTotal(sum); // Show the total for all categories
           }}
           style={expenseStyle.categoryButton}
+          labelStyle={expenseStyle.categoryButtonText}
         >
           All
         </Button>
@@ -136,6 +136,7 @@ export const Exp = ({ navigation }) => {
             mode="contained"
             onPress={() => handleCategorySelect(category)}
             style={expenseStyle.categoryButton}
+            labelStyle={expenseStyle.categoryButtonText}
           >
             {category}
           </Button>
@@ -143,7 +144,6 @@ export const Exp = ({ navigation }) => {
       </>
     );
   };
-
   const renderExpenses = () => {
     const data = selectedCategory ? groupedExpenses[selectedCategory] : expenses[selectedYear]?.[selectedMonth] || [];
     return (
@@ -155,22 +155,22 @@ export const Exp = ({ navigation }) => {
       />
     );
   };
-
+  
   const budget = selectedCategory ? budgets[selectedCategory] : Object.values(budgets || {}).reduce((acc, budget) => acc + budget, 0);
   const progress = budget ? (categoryTotal / budget) : 0;
-
+  
   // Calculate total budget and progress
   const totalBudget = Object.values(budgets || {}).reduce((acc, budget) => acc + budget, 0);
   const totalProgress = totalBudget ? (sum / totalBudget) : 0;
-
+  
   const showDatePicker = () => {
     setDatePickerVisibility(true);
   };
-
+  
   const hideDatePicker = () => {
     setDatePickerVisibility(false);
   };
-
+  
   const handleConfirm = (date) => {
     const year = date.getFullYear();
     const month = date.getMonth();
@@ -178,13 +178,13 @@ export const Exp = ({ navigation }) => {
     setSelectedMonth(month);
     hideDatePicker();
   };
-
+  
   return (
     <View style={expenseStyle.container}>
       <Text style={expenseStyle.total}>Total: ${sum.toFixed(2)}</Text>
       {totalBudget > 0 && (
         <View style={expenseStyle.progressContainer}>
-          <Progress.Bar progress={totalProgress} width={200} />
+          <Progress.Bar progress={totalProgress} width={200} color="black" />
           <Text>{sum.toFixed(2)} / {totalBudget.toFixed(2)}</Text>
         </View>
       )}
@@ -195,7 +195,7 @@ export const Exp = ({ navigation }) => {
           </Text>
           {budget ? (
             <View style={expenseStyle.progressContainer}>
-              <Progress.Bar progress={progress} width={200} />
+              <Progress.Bar progress={progress} width={200} color="black" />
               <Text>{categoryTotal.toFixed(2)} / {budget}</Text>
             </View>
           ) : null}
@@ -204,13 +204,17 @@ export const Exp = ({ navigation }) => {
       <View style={expenseStyle.navBar}>
         <Button 
           icon={() => <MaterialCommunityIcons name="step-backward" size={24} color="black" />}
-          onPress={handlePrevMonth}></Button>
+          onPress={handlePrevMonth}
+          color="black"
+        />
         <TouchableOpacity onPress={showDatePicker}>
           <Text style={expenseStyle.monthText}>{`${months[selectedMonth]} ${selectedYear}`}</Text>
         </TouchableOpacity>
         <Button
           onPress={handleNextMonth}
-          icon={() => <MaterialCommunityIcons name="step-forward" size={24} color="black" />}></Button>
+          icon={() => <MaterialCommunityIcons name="step-forward" size={24} color="black" />}
+          color="black"
+        />
       </View>
       <ScrollView contentContainerStyle={expenseStyle.categoryButtonsContainer}>
         {renderCategoryButtons()}
@@ -221,14 +225,20 @@ export const Exp = ({ navigation }) => {
       <View style={expenseStyle.actions}>
         <Button
           mode='contained'
-          icon={() => <MaterialCommunityIcons name="plus" size={24} color="black" />}
-          onPress={() => navigation.navigate("AddExpense", { selectedYear, selectedMonth })}>
+          icon={() => <MaterialCommunityIcons name="plus" size={24} color="white" />}
+          onPress={() => navigation.navigate("AddExpense", { selectedYear, selectedMonth })}
+          style={expenseStyle.button}
+          labelStyle={expenseStyle.buttonLabel}
+        >
           Add
         </Button>
         <Button
           mode='contained'
-          icon={() => <MaterialCommunityIcons name="currency-usd" size={24} color="black" />}
-          onPress={() => navigation.navigate("BudgetScreen")}>
+          icon={() => <MaterialCommunityIcons name="currency-usd" size={24} color="white" />}
+          onPress={() => navigation.navigate("BudgetScreen")}
+          style={expenseStyle.button}
+          labelStyle={expenseStyle.buttonLabel}
+        >
           Budget
         </Button>
       </View>
@@ -243,5 +253,5 @@ export const Exp = ({ navigation }) => {
       />
     </View>
   );
-};
-
+  };
+  

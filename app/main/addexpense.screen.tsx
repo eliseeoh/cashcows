@@ -8,7 +8,7 @@ import { expenseStyle } from './settings.screenstyle';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 // Constants
-const categories = ['Food', 'Health', 'Clothing', 'Household', 'Transport', 'Travel', 'Utilities', 'Entertainment', 'Payments', 'Personal', 'Others'];
+const categories = ['Food', 'Health', 'Clothing', 'Household', 'Transport', 'Travel', 'Utilities', 'Entertainment', 'Payments', 'Personal', 'Gifts', 'Miscellaneous'];
 
 export const AddExp = ({ navigation, route }) => {
   const { addExpense, editExpense } = useContext(AuthContext);
@@ -78,6 +78,8 @@ export const AddExp = ({ navigation, route }) => {
         value={title}
         onChangeText={setTitle}
         style={expenseStyle.textInput}
+        mode="outlined"
+        theme={{ colors: { background: '#f2f2f2' } }} // Set faint grey background
       />
       <TextInput 
         label="Price"
@@ -85,8 +87,10 @@ export const AddExp = ({ navigation, route }) => {
         onChangeText={setPrice}
         keyboardType="numeric"
         style={expenseStyle.textInput}
+        mode="outlined"
+        theme={{ colors: { background: '#f2f2f2' } }} // Set faint grey background
       />
-      <Button onPress={() => setShow(true)} style={expenseStyle.button}>
+      <Button onPress={() => setShow(true)} style={expenseStyle.button} labelStyle={expenseStyle.buttonLabel}>
         Select Date
       </Button>
       <Text>{date.toDateString()}</Text>
@@ -98,7 +102,7 @@ export const AddExp = ({ navigation, route }) => {
           onChange={onChange}
         />
       )}
-      <Button mode="contained" onPress={handleSave} style={expenseStyle.button}>
+      <Button mode="contained" onPress={handleSave} style={expenseStyle.smallButton} labelStyle={expenseStyle.smallButtonText}>
         {expense ? 'Update' : 'Save'}
       </Button>
     </View>

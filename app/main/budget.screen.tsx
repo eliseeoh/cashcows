@@ -6,7 +6,7 @@ import { expenseStyle } from './settings.screenstyle';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../config/firebaseConfig';
 
-const categories = ['Food', 'Health', 'Clothing', 'Household', 'Transport', 'Travel', 'Utilities', 'Entertainment', 'Payments', 'Personal', 'Others'];
+const categories = ['Food', 'Health', 'Clothing', 'Household', 'Transport', 'Travel', 'Utilities', 'Entertainment', 'Payments', 'Personal', 'Gifts', 'Miscellaneous'];
 
 export const BudgetScreen = ({ navigation }) => {
   const { state, setBudgets } = useContext(AuthContext);
@@ -48,6 +48,8 @@ export const BudgetScreen = ({ navigation }) => {
               onChangeText={(text) => handleInputChange(text, category)}
               keyboardType="numeric"
               style={expenseStyle.textInput}
+              mode="outlined"
+              theme={{ colors: { background: '#f2f2f2' } }} // Set faint grey background
             />
           </Card.Content>
         </Card>

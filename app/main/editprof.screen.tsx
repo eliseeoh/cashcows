@@ -8,7 +8,7 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db, storage } from '../../config/firebaseConfig';
 
 export const Edit = ({ navigation }) => {
-  const { state } = useContext(AuthContext);
+  const { state, updateProfilePicture } = useContext(AuthContext); // Add updateProfilePicture to context
   const [photoURL, setPhotoURL] = useState(state.user.photoURL);
   const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -57,6 +57,7 @@ export const Edit = ({ navigation }) => {
         await updateDoc(userRef, { photoURL: updatedPhotoURL });
 
         setPhotoURL(updatedPhotoURL);
+        updateProfilePicture(state.userId, updatedPhotoURL); // Update profile picture in context
       }
 
       Alert.alert("Success", "Profile updated successfully.");

@@ -117,15 +117,24 @@ const reducer = (prevState, action) => {
         budgets: action.budgets,
       };
 
-    case 'UPDATE_PROFILE':
+    case 'UPDATE_PROFILE_PICTURE':
       return {
         ...prevState,
-        user: { ...prevState.user, ...action.payload },
+        user: {
+          ...prevState.user,
+          photoURL: action.payload.photoURL,
+        },
       };
-
     default:
       return prevState;
   }
+};
+
+const updateProfilePicture = async (userId, photoURL) => {
+  dispatch({
+    type: 'UPDATE_PROFILE_PICTURE',
+    payload: { photoURL },
+  });
 };
 
 const fetchUserExpenses = async (userId, dispatch) => {
@@ -308,6 +317,7 @@ const AuthProvider = ({ children }) => {
     setBudgets,
     uploadProfilePicture,
     updateUserProfile,
+    updateProfilePicture,
   }), [state]);
 
   return (
