@@ -252,14 +252,9 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-  const updateProfilePicture = async (photoURL) => {
-    const { userId } = state;
-    if (!userId) {
-      console.error('User ID is null, cannot update profile picture.');
-      return;
-    }
+  const updateProfilePicture = async (userId, photoURL) => {
     try {
-      await uploadProfilePictureAPI(userId, photoURL);
+      await updateDoc(doc(db, "users", userId), { photoURL });
       dispatch({
         type: 'UPDATE_PROFILE_PICTURE',
         payload: { photoURL },
@@ -267,7 +262,7 @@ const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('Error updating profile picture:', error);
     }
-  };
+  };  
 
   const authContext = useMemo(() => ({
     signIn: async (email, password) => {
@@ -313,7 +308,7 @@ const AuthProvider = ({ children }) => {
     editExpense,
     deleteExpense,
     setBudgets,
-    uploadProfilePicture: uploadProfilePictureAPI, // Ensure this is defined
+    uploadProfilePicture: uploadProfilePictureAPI,
     updateUserProfile,
     updateProfilePicture,
   }), [state]);

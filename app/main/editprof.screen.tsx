@@ -3,12 +3,13 @@ import { View, Alert, Image, Text, ActivityIndicator, Pressable } from 'react-na
 import { AuthContext } from '../../authentication/authContext';
 import { settStyle } from './settings.screenstyle';
 import * as ImagePicker from 'expo-image-picker';
+import * as ImageManipulator from 'expo-image-manipulator';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc } from 'firebase/firestore';
 import { db, storage } from '../../config/firebaseConfig';
 
 export const Edit = ({ navigation }) => {
-  const { state, updateProfilePicture } = useContext(AuthContext); // Add updateProfilePicture to context
+  const { state, updateProfilePicture } = useContext(AuthContext);
   const [photoURL, setPhotoURL] = useState(state.user.photoURL);
   const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -22,11 +23,8 @@ export const Edit = ({ navigation }) => {
         quality: 1,
       });
 
-      console.log('ImagePicker result:', result);
-
       if (!result.canceled && result.assets && result.assets.length > 0) {
         setImage(result.assets[0].uri);
-        console.log('Image URI set:', result.assets[0].uri);
       } else {
         Alert.alert("Error", "No image selected or operation canceled.");
       }
@@ -41,23 +39,25 @@ export const Edit = ({ navigation }) => {
     try {
       let updatedPhotoURL = photoURL;
       if (image) {
-        console.log('Uploading image:', image);
+        const manipResult = await ImageManipulator.manipulateAsync(
+          image,
+          [{ resize: { width: 300, height: 300 } }],
+          { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG }
+        );
 
-        // Upload the image to Firebase Storage
         const storageRef = ref(storage, `profilePictures/${state.userId}`);
-        const response = await fetch(image);
+        const response = await fetch(manipResult.uri);
         const blob = await response.blob();
         const snapshot = await uploadBytes(storageRef, blob);
         updatedPhotoURL = await getDownloadURL(snapshot.ref);
 
-        console.log('Updated photo URL:', updatedPhotoURL);
-
-        // Update Firestore with the photo URL
         const userRef = doc(db, 'users', state.userId);
         await updateDoc(userRef, { photoURL: updatedPhotoURL });
 
+        // Immediately update the local state
         setPhotoURL(updatedPhotoURL);
         updateProfilePicture(state.userId, updatedPhotoURL); // Update profile picture in context
+        setImage(null); // Clear the image selection
       }
 
       Alert.alert("Success", "Profile updated successfully.");
