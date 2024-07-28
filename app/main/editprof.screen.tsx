@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { View, Alert, Image, Button, ActivityIndicator } from 'react-native';
+import { View, Alert, Image, Text, ActivityIndicator, Pressable } from 'react-native';
 import { AuthContext } from '../../authentication/authContext';
 import { settStyle } from './settings.screenstyle';
 import * as ImagePicker from 'expo-image-picker';
@@ -71,13 +71,17 @@ export const Edit = ({ navigation }) => {
   };
 
   return (
-    <View style={[settStyle.view, { backgroundColor: 'white' }]}>
+    <View style={[settStyle.view]}>
       <Image source={{ uri: image || photoURL }} style={settStyle.image} />
-      <Button title="Choose Profile Picture" onPress={handleChoosePhoto} />
+      <Pressable style={settStyle.profButton} onPress={handleChoosePhoto}>
+        <Text style={settStyle.buttonText}>Choose Picture</Text>
+      </Pressable>
       {uploading ? (
         <ActivityIndicator size="large" color="#0000ff" />
       ) : (
-        <Button title="Save" onPress={handleSave} />
+        <Pressable style={settStyle.profButton} onPress={handleSave}>
+          <Text style={settStyle.buttonText}>Save</Text>
+        </Pressable>
       )}
     </View>
   );

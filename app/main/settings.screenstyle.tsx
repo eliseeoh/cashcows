@@ -21,14 +21,33 @@ export const settStyle = StyleSheet.create({
         marginBottom: 10,
         width: '80%'
     },
-    button: {
-        marginBottom: 20
-    },
     row: {
         marginTop: 10,
         alignItems: "center",
         justifyContent: "center",
         flexDirection: 'row'
+    },
+    button: {
+      padding: 15,
+      backgroundColor: '#000000',
+      borderRadius: 15,
+      alignItems: 'center',
+      marginRight: 10
+    },
+    profButton: {
+      padding: 15,
+      backgroundColor: '#000000',
+      borderRadius: 15,
+      alignItems: 'center',
+      marginBottom: 5
+    },
+    buttonText: {
+      color: '#fff',
+      fontSize: 13,
+      fontWeight: 'bold',
+    },
+    buttView: {
+      flexDirection: 'row'
     }
 })
  
@@ -107,14 +126,26 @@ export const friendStyle = StyleSheet.create({
 export const expenseStyle = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 10,
+    margin: 20,
   },
   card: {
     marginBottom: 10,
+    padding: 15,
+    backgroundColor: 'white',
+    borderRadius: 20
   },
   textInput: {
-    marginBottom: 10,
     backgroundColor: '#f2f2f2',
+    borderColor: '#black', 
+    borderWidth: 1, 
+    borderRadius: 5, 
+    padding: 10,
+    marginTop: 15
+  },
+  title: {
+    color: 'black',
+    fontWeight: 'bold',
+    fontSize: 18
   },
   button: {
     marginTop: 10,
@@ -375,5 +406,61 @@ export const winnerLog = StyleSheet.create({
     marginTop: 10,
     fontSize: 18,
     color: '#000',
+  },
+})
+
+export const analytics = StyleSheet.create({
+  legendContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
+    marginBottom: 10,
+    alignItems: 'center'
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 10,
+    marginBottom: 5,
+    backgroundColor: "white",
+    padding: 12,
+    borderRadius: 15
+  },
+  legendColorBox: {
+    width: 15,
+    height: 15,
+    marginRight: 5,
+  },
+  legendText: {
+    fontSize: 14,
+    color: 'black',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#000',
+    marginBottom: 10
+  },
+  progressBarContainer: {
+    marginTop: 10,
+  },
+  selectedCategoryContainer: {
+    marginRight: 10,
+    marginBottom: 5,
+    backgroundColor: "white",
+    padding: 12,
+    borderRadius: 15,
+    paddingBottom: 20
+  },
+  picker: {
+    height: 50,
+    width: '100%',
+    marginVertical: 10,
+    borderColor: 'black'
+  },
+  pickerWrapper: {
+    borderColor: 'black',
+    borderWidth: 1,
+    borderRadius: 4,
+    overflow: 'hidden',
   },
 })

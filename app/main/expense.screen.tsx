@@ -185,7 +185,7 @@ export const Exp = ({ navigation }) => {
       {totalBudget > 0 && (
         <View style={expenseStyle.progressContainer}>
           <Progress.Bar progress={totalProgress} width={200} color="black" />
-          <Text>{sum.toFixed(2)} / {totalBudget.toFixed(2)}</Text>
+          <Text>  {sum.toFixed(2)} / {totalBudget.toFixed(2)}</Text>
         </View>
       )}
       {selectedCategory && (
@@ -196,7 +196,7 @@ export const Exp = ({ navigation }) => {
           {budget ? (
             <View style={expenseStyle.progressContainer}>
               <Progress.Bar progress={progress} width={200} color="black" />
-              <Text>{categoryTotal.toFixed(2)} / {budget}</Text>
+              <Text>  {categoryTotal.toFixed(2)} / {budget}</Text>
             </View>
           ) : null}
         </View>

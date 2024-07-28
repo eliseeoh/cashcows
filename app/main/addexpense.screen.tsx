@@ -1,10 +1,9 @@
 import React, { useState, useContext } from 'react';
-import { View, Alert, Text, Platform } from "react-native";
-import { TextInput, Button } from 'react-native-paper';
+import { View, Alert, Text, Platform, TextInput, Pressable } from "react-native";
 import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { AuthContext } from '../../authentication/authContext';
-import { expenseStyle } from './settings.screenstyle';
+import { expenseStyle, friendStyle } from './settings.screenstyle';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 // Constants
@@ -55,6 +54,11 @@ export const AddExp = ({ navigation, route }) => {
   };
 
   const onChange = (event, selectedDate) => {
+    if (event.type === 'dismissed') {
+      // Date Picker was cancelled
+      setShow(false);
+      return;
+    }
     const currentDate = selectedDate || date;
     setShow(Platform.OS === 'android');
     setDate(currentDate);
@@ -74,25 +78,18 @@ export const AddExp = ({ navigation, route }) => {
         dropDownContainerStyle={expenseStyle.dropdownContainer}
       />
       <TextInput 
-        label="Title"
+        placeholder="Title"
         value={title}
         onChangeText={setTitle}
         style={expenseStyle.textInput}
-        mode="outlined"
-        theme={{ colors: { background: '#f2f2f2' } }} // Set faint grey background
       />
       <TextInput 
-        label="Price"
+        placeholder="Price"
         value={price}
         onChangeText={setPrice}
         keyboardType="numeric"
-        style={expenseStyle.textInput}
-        mode="outlined"
-        theme={{ colors: { background: '#f2f2f2' } }} // Set faint grey background
+        style={[expenseStyle.textInput, {marginBottom: 10}]}
       />
-      <Button onPress={() => setShow(true)} style={expenseStyle.button} labelStyle={expenseStyle.buttonLabel}>
-        Select Date
-      </Button>
       <Text>{date.toDateString()}</Text>
       {show && (
         <DateTimePicker
@@ -102,9 +99,12 @@ export const AddExp = ({ navigation, route }) => {
           onChange={onChange}
         />
       )}
-      <Button mode="contained" onPress={handleSave} style={expenseStyle.smallButton} labelStyle={expenseStyle.smallButtonText}>
-        {expense ? 'Update' : 'Save'}
-      </Button>
+      <Pressable style={friendStyle.button} onPress={() => setShow(true)}>
+        <Text style={friendStyle.buttonText}>Select Date</Text>
+      </Pressable>
+      <Pressable style={friendStyle.button} onPress={handleSave}>
+        <Text style={friendStyle.buttonText}>{expense? 'Update' : 'Save'}</Text>
+      </Pressable>
     </View>
   );
 };

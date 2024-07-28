@@ -4,7 +4,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import {Exp} from './expense.screen'
 import {Settings} from './settings.screen'
 import {Friends} from './friends.screen'
-import {Analytics} from './analytics.screen'
+import Analytics from './analytics.screen'
 
 const Tab = createBottomTabNavigator();
 

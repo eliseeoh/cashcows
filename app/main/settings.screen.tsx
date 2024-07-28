@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Text, Image, Button, ScrollView, View } from "react-native";
+import { Text, Image, Button, ScrollView, View, Pressable } from "react-native";
 import { AuthContext } from '../../authentication/authContext';
-import { settStyle } from './settings.screenstyle';
+import { settStyle, friendStyle } from './settings.screenstyle';
 
 export const Settings = ({ navigation }) => {
   const { state, signOut } = useContext(AuthContext);
@@ -40,8 +40,14 @@ export const Settings = ({ navigation }) => {
     <ScrollView contentContainerStyle={settStyle.view}>
       <Image source={{ uri: user.img }} style={settStyle.image} />
       <Text style={settStyle.text}>{user.username}</Text>
-      <Button title="Edit Profile" onPress={() => navigation.navigate("Edit Profile")} />
-      <Button title="Log Out" onPress={handleLogout} />
+      <View style={settStyle.buttView}>
+        <Pressable style={settStyle.button} onPress={() => navigation.navigate("Edit Profile")}>
+          <Text style={settStyle.buttonText}>Edit Profile</Text>
+        </Pressable>
+        <Pressable style={settStyle.button} onPress={handleLogout}>
+          <Text style={settStyle.buttonText}>Log Out</Text>
+        </Pressable>
+      </View>
     </ScrollView>
   );
 }

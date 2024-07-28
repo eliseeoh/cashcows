@@ -142,7 +142,7 @@ export const Friends = ({ navigation }) => {
     return (
         <SafeAreaView style={friendStyle.container}>
             <ScrollView>
-                <Text>Your Groups:</Text>
+                <Text style={groupStyle.title}>Your Groups:</Text>
                 {groups.map(group => (
                     <TouchableOpacity key={group.id} onPress={() => handleGroupPress(group.id)}>
                         <View style={friendStyle.groupContainer}>

@@ -1,8 +1,7 @@
 import React, { useState, useContext } from 'react';
-import { View, Alert, ScrollView } from 'react-native';
-import { TextInput, Button, Card } from 'react-native-paper';
+import { View, TextInput, Text, Alert, ScrollView, Pressable } from 'react-native';
 import { AuthContext } from '../../authentication/authContext';
-import { expenseStyle } from './settings.screenstyle';
+import { expenseStyle, friendStyle } from './settings.screenstyle';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../config/firebaseConfig';
 
@@ -39,24 +38,20 @@ export const BudgetScreen = ({ navigation }) => {
   return (
     <ScrollView style={expenseStyle.container}>
       {categories.map((category) => (
-        <Card key={category} style={expenseStyle.card}>
-          <Card.Title title={category} />
-          <Card.Content>
-            <TextInput
-              label="Budget"
-              value={budgets[category]?.toString() || ''}
-              onChangeText={(text) => handleInputChange(text, category)}
-              keyboardType="numeric"
-              style={expenseStyle.textInput}
-              mode="outlined"
-              theme={{ colors: { background: '#f2f2f2' } }} // Set faint grey background
-            />
-          </Card.Content>
-        </Card>
+        <View key={category} style={expenseStyle.card}>
+        <Text style={expenseStyle.title}>{category}</Text>
+        <TextInput
+          placeholder="Budget"
+          value={budgets[category]?.toString() || ''}
+          onChangeText={(text) => handleInputChange(text, category)}
+          keyboardType="numeric"
+          style={expenseStyle.textInput}
+        />
+      </View>
       ))}
-      <Button mode="contained" onPress={handleSave} style={expenseStyle.button}>
-        Save Budgets
-      </Button>
+      <Pressable onPress={handleSave} style={friendStyle.button}>
+        <Text style={friendStyle.buttonText}>Save Budgets</Text>
+      </Pressable>
     </ScrollView>
   );
 };
