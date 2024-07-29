@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, SafeAreaView, FlatList, Alert, Image, ActivityIndicator, Pressable } from 'react-native';
-import { doc, getDoc, getDocs, collection, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db, storage } from '../../config/firebaseConfig';
 import * as ImagePicker from 'expo-image-picker';
+import * as ImageManipulator from 'expo-image-manipulator';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { winnerLog } from './settings.screenstyle';
 
@@ -15,26 +16,26 @@ export const WinnerLog = ({ route }) => {
 
     useEffect(() => {
         const fetchWinners = async () => {
-        setFetchingImages(true);
-        try {
-            const groupRef = doc(db, 'groups', groupId);
-            const groupDoc = await getDoc(groupRef);
+            setFetchingImages(true);
+            try {
+                const groupRef = doc(db, 'groups', groupId);
+                const groupDoc = await getDoc(groupRef);
 
-            if (groupDoc.exists()) {
-                const groupData = groupDoc.data();
-                const winnersList = groupData.winners || [];
-                setWinners(winnersList);
-            } else {
-                Alert.alert('Error', 'Group not found.');
+                if (groupDoc.exists()) {
+                    const groupData = groupDoc.data();
+                    const winnersList = groupData.winners || [];
+                    setWinners(winnersList);
+                } else {
+                    Alert.alert('Error', 'Group not found.');
+                }
+            } catch (error) {
+                console.error('Error fetching winners:', error);
+                Alert.alert('Error', 'Failed to fetch winners. Please try again later.');
+            } finally {
+                setLoading(false); 
+                setFetchingImages(false);
             }
-        } catch (error) {
-            console.error('Error fetching winners:', error);
-            Alert.alert('Error', 'Failed to fetch winners. Please try again later.');
-        } finally {
-            setLoading(false); 
-            setFetchingImages(false);
-        }
-    };
+        };
 
         fetchWinners();
     }, [groupId]);
@@ -45,8 +46,9 @@ export const WinnerLog = ({ route }) => {
                 <ActivityIndicator size="large" color="#000000" />
                 <Text style={winnerLog.text}>Loading...</Text>
             </View>
-        )
+        );
     }
+
     const uploadProof = async (winnerId) => {
         try {
             const result = await ImagePicker.launchImageLibraryAsync({
@@ -59,9 +61,17 @@ export const WinnerLog = ({ route }) => {
             if (!result.canceled) {
                 setUploading(true);
                 const uri = result.assets[0].uri;
-                const response = await fetch(uri);
+
+                // Resize the image
+                const resizedImage = await ImageManipulator.manipulateAsync(
+                    uri,
+                    [{ resize: { width: 800 } }], // Resize to width 800, height will be adjusted to maintain aspect ratio
+                    { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG } // Compress to 70% quality
+                );
+
+                const response = await fetch(resizedImage.uri);
                 const blob = await response.blob();
-    
+
                 // Upload the image to Firebase Storage
                 const storageRef = ref(storage, `proofs/${winnerId}`);
                 const snapshot = await uploadBytes(storageRef, blob);

@@ -1,9 +1,9 @@
 import React, { useState, useContext } from 'react';
-import { View, Alert, SafeAreaView, Image, ScrollView, Pressable, Text} from 'react-native';
-import { TextInput, Button, Card } from 'react-native-paper';
+import { View, Alert, SafeAreaView, Image, ScrollView, Pressable, Text } from 'react-native';
+import { TextInput } from 'react-native-paper';
 import { AuthContext } from '../../authentication/authContext';
 import { loginStyles } from './login.screenstyle';
-import loginImage from '../../assets/images/cashciws.png'
+import loginImage from '../../assets/images/cashciws.png';
 
 export const RegisterScn = ({ navigation }) => {
   const { signUp } = useContext(AuthContext);
@@ -41,7 +41,7 @@ export const RegisterScn = ({ navigation }) => {
   return (
     <SafeAreaView style={loginStyles.regAC}>
       <ScrollView contentContainerStyle={loginStyles.scrollV}>
-      <View style={loginStyles.viewReg}>
+        <View style={loginStyles.viewReg}>
           <Image 
             source={loginImage} 
             style={loginStyles.image} 
@@ -58,10 +58,10 @@ export const RegisterScn = ({ navigation }) => {
             <TextInput 
               placeholder="Email"
               placeholderTextColor="#999"
-              secureTextEntry
               autoCapitalize="none"
               onChangeText={setEmail}
               style={loginStyles.regTI}
+              secureTextEntry={false} // Email should be visible
             />
             <TextInput 
               placeholder="Password"
@@ -69,6 +69,7 @@ export const RegisterScn = ({ navigation }) => {
               autoCapitalize="none"
               onChangeText={setPassword}
               style={[loginStyles.regTI, loginStyles.passwordInput]}
+              secureTextEntry={true} // Password should be hidden
             />
             <Pressable onPress={handleRegister} style={loginStyles.button}>
               <Text style={loginStyles.buttonText}>Sign Up</Text>
@@ -79,4 +80,3 @@ export const RegisterScn = ({ navigation }) => {
     </SafeAreaView>
   );
 };
-
